@@ -1,44 +1,56 @@
-section .data
+; ---------------------------------------------------------------------------
+; calculate_average - arithmetic mean of a signed 32-bit integer array.
+;
+;   Calling convention : cdecl (32-bit x86). The argument layout is identical
+;                        on Linux and Windows; only the symbol decoration
+;                        differs, so the target format selects the symbol name.
+;
+;       [ebp +  8] = const int *numbers
+;       [ebp + 12] = int count
+;
+;   Returns ST(0) = mean (IEEE-754 double).
+;   An empty array (count <= 0) returns 0.0 instead of dividing by zero.
+; ---------------------------------------------------------------------------
+
+%ifidn __OUTPUT_FORMAT__, win32
+    global _calculate_average
+    %define SYMBOL _calculate_average
+%else
+    global calculate_average
+    %define SYMBOL calculate_average
+%endif
 
 section .text
-global calculate_average
 
-; Function: calculate_average
-; Arguments:
-;   - [esp+4] -> pointer to the array of integers
-;   - [esp+8] -> count of the array elements
-; Return:
-;   - ST(0) -> calculated average (double)
-
-calculate_average:
-    ; Prologue
+SYMBOL:
     push ebp
-    mov ebp, esp
-    fldz                    ; Load 0.0 into the FPU register stack (ST(0) = 0.0)
+    mov  ebp, esp
 
-    mov ecx, [ebp+8]        ; Load count into ecx
-    mov edx, [ebp+4]        ; Load pointer to array into edx
+    mov  ecx, [ebp + 12]            ; ecx = count
+    mov  edx, [ebp + 8]             ; edx = pointer to the array
+    test ecx, ecx
+    jle  .empty
+
+    fldz                            ; st0 = 0.0  (running sum)
 
 .loop:
-    ; Check if the loop is done
-    test ecx, ecx
-    jz .done
+    fild dword [edx]                ; st0 = numbers[i], st1 = sum
+    faddp st1, st0                  ; sum += numbers[i]
+    add  edx, 4                     ; advance to the next int (32-bit)
+    dec  ecx
+    jnz  .loop
 
-    ; Load the next integer from the array and add it to the sum
-    fld dword [edx + 4*(ecx-1)] ; Load integer as float onto FPU stack
-    faddp st1, st0              ; Add ST(0) to ST(1) and pop
-
-    ; Decrement loop counter
-    dec ecx
-    jmp .loop
-
-.done:
-    ; Calculate the average by dividing the sum by the count
-    mov eax, [ebp+8]            ; Load count into eax
-    cdq                         ; Sign-extend eax to edx:eax
-    fld1                        ; Load 1.0 onto the FPU stack
-    fidiv dword [ebp+8]         ; Divide ST(0) by count
-
-    ; Epilogue
+    fild dword [ebp + 12]           ; st0 = count, st1 = sum
+    fdivp st1, st0                  ; st0 = sum / count
     leave
     ret
+
+.empty:
+    fldz                            ; return 0.0
+    leave
+    ret
+
+%ifidn __OUTPUT_FORMAT__, elf32
+section .note.GNU-stack noalloc noexec nowrite progbits
+%endif
+

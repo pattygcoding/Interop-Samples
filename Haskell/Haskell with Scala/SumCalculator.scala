@@ -1,17 +1,25 @@
-import scala.io.Source
-import java.io.PrintWriter
+import scala.io.StdIn
 
-object SumCalculator {
-  def main(args: Array[String]): Unit = {
-    // Read the numbers from the file
-    val numbers = Source.fromFile("numbers.txt").getLines().flatMap(_.split(" ")).map(_.toDouble).toList
+/**
+ * Interop sample: reads whitespace-separated numbers from standard input and
+ * prints their sum to standard output.
+ *
+ * Invoked by `main.hs`; see README.md for build and run instructions.
+ */
+object SumCalculator:
 
-    // Calculate the sum
-    val sum = numbers.sum
+  def main(args: Array[String]): Unit =
+    val line = Option(StdIn.readLine()).getOrElse("")
 
-    // Write the sum to a result file
-    val writer = new PrintWriter("result.txt")
-    writer.write(sum.toString)
-    writer.close()
-  }
-}
+    val numbers = line
+      .trim
+      .split("\\s+")
+      .filter(_.nonEmpty)
+      .map(_.toDouble)
+
+    if numbers.isEmpty then
+      Console.err.println("error: no numbers on stdin")
+      sys.exit(1)
+
+    println(numbers.sum)
+

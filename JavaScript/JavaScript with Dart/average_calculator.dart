@@ -1,22 +1,43 @@
 import 'dart:convert';
+import 'dart:io';
 
-void main(List<String> args) {
-  if (args.isEmpty) {
-    print('Usage: dart average_calculator.dart <json_array>');
+/// Interop sample: reads a JSON array of numbers from standard input and writes
+/// the arithmetic mean to standard output.
+///
+/// Invoked by `main.js`; see README.md for build and run instructions.
+void main() {
+  final input = stdin.readLineSync();
+
+  if (input == null || input.trim().isEmpty) {
+    stderr.writeln('error: expected a JSON array of numbers on stdin');
+    exitCode = 1;
     return;
   }
 
-  // Parse the JSON array passed from JavaScript
-  String jsonArray = args[0];
-  List<dynamic> numbers = jsonDecode(jsonArray);
+  try {
+    final decoded = jsonDecode(input);
 
-  // Convert dynamic list to a list of doubles
-  List<double> doubleNumbers = numbers.map((n) => n.toDouble()).toList();
+    if (decoded is! List) {
+      stderr.writeln('error: input must be a JSON array');
+      exitCode = 1;
+      return;
+    }
 
-  // Calculate the average
-  double sum = doubleNumbers.reduce((a, b) => a + b);
-  double average = sum / doubleNumbers.length;
+    final numbers = decoded.map((value) => (value as num).toDouble()).toList();
 
-  // Print the average, which will be captured by the JavaScript script
-  print(average);
+    if (numbers.isEmpty) {
+      stderr.writeln('error: the array is empty');
+      exitCode = 1;
+      return;
+    }
+
+    final sum = numbers.fold<double>(0.0, (total, value) => total + value);
+    final average = sum / numbers.length;
+
+    stdout.writeln(average);
+  } on FormatException catch (error) {
+    stderr.writeln('error: invalid JSON: ${error.message}');
+    exitCode = 1;
+  }
 }
+

@@ -1,24 +1,49 @@
-import System.IO
-import System.Process
+module Main (main) where
+
+import Control.Monad (when)
+import System.Exit (ExitCode (..), die)
+import System.Process (readProcessWithExitCode)
+import Text.Printf (printf)
+
+-- | Interop sample: Haskell driving a Scala program.
+--
+-- Haskell sends the numbers to the Scala helper on stdin; the helper prints
+-- their sum on stdout, and Haskell turns that into the average.
+--
+-- See README.md for build and run instructions.
+
+numbers :: [Double]
+numbers = [10, 20, 30, 40, 50]
 
 main :: IO ()
 main = do
-    -- Define the list of numbers
-    let numbers = [10.0, 20.0, 30.0, 40.0, 50.0]
-    
-    -- Write the numbers to a file for the Scala program to read
-    writeFile "numbers.txt" (unwords $ map show numbers)
-    
-    -- Call the Scala program to calculate the sum
-    _ <- system("scala SumCalculator")
+    when (null numbers) $ die "error: no numbers to average"
 
-    -- Read the sum from the result file
-    sumResult <- readFile "result.txt"
-    let sumValue = read sumResult :: Double
+    let count = length numbers
+        payload = unwords (map show numbers)
 
-    -- Calculate the average
-    let count = fromIntegral (length numbers)
-    let average = sumValue / count
+    total <- runSumCalculator payload
 
-    -- Print the average
-    putStrLn $ "The average is: " ++ show average
+    printf "The average of %d value(s) is: %.2f\n"
+        count
+        (total / fromIntegral count)
+
+-- | Run the Scala helper, feeding it the numbers on stdin.
+runSumCalculator :: String -> IO Double
+runSumCalculator payload = do
+    (exitCode, stdout, stderr) <-
+        readProcessWithExitCode "scala" ["SumCalculator.scala"] payload
+    case exitCode of
+        ExitSuccess -> parseTotal stdout
+        ExitFailure code ->
+            die (printf "error: the Scala helper exited with %d: %s" code stderr)
+
+-- | Parse the sum printed by the Scala helper.
+parseTotal :: String -> IO Double
+parseTotal text =
+    case reads text of
+        [(value, rest)] | all isSpaceChar rest -> pure value
+        _ -> die ("error: unexpected output from the Scala helper: " ++ show text)
+  where
+    isSpaceChar c = c `elem` (" \t\r\n" :: String)
+

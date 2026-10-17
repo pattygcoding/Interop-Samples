@@ -1,25 +1,88 @@
-const { exec } = require('child_process');
+'use strict';
 
-function calculateAverage(numbers) {
-    // Convert the list of numbers to a JSON string
-    const numbersJson = JSON.stringify(numbers);
+/**
+ * Interop sample: Node.js driving a Dart program.
+ *
+ * The child process reads a JSON array of numbers from stdin and writes the
+ * average to stdout. Using stdin (rather than a command-line argument) keeps
+ * large inputs and shell quoting out of the picture.
+ *
+ * See README.md for build and run instructions.
+ */
 
-    // Call the Dart program and pass the numbers as a command-line argument
-    exec(`dart average_calculator.dart ${numbersJson}`, (error, stdout, stderr) => {
-        if (error) {
-            console.error(`Error: ${error.message}`);
-            return;
-        }
-        if (stderr) {
-            console.error(`stderr: ${stderr}`);
-            return;
-        }
+const { spawn } = require('node:child_process');
+const path = require('node:path');
 
-        // Print the output from the Dart program
-        console.log(`The average is: ${stdout.trim()}`);
+// Resolve the Dart entry point relative to this script, not to the working dir.
+const SCRIPT = path.join(__dirname, 'average_calculator.dart');
+
+/**
+ * Run the Dart helper and resolve with the average it computes.
+ *
+ * @param {number[]} numbers values to average
+ * @param {string} [scriptPath] path to the Dart entry point
+ * @returns {Promise<number>}
+ */
+function calculateAverage(numbers, scriptPath = SCRIPT) {
+  return new Promise((resolve, reject) => {
+    if (!Array.isArray(numbers) || numbers.length === 0) {
+      reject(new Error('calculateAverage expects a non-empty array'));
+      return;
+    }
+
+    const child = spawn('dart', [scriptPath], {
+      stdio: ['pipe', 'pipe', 'pipe'],
     });
+
+    let stdout = '';
+    let stderr = '';
+
+    child.stdout.on('data', (chunk) => {
+      stdout += chunk;
+    });
+    child.stderr.on('data', (chunk) => {
+      stderr += chunk;
+    });
+
+    child.on('error', (error) => {
+      reject(new Error(`failed to start dart: ${error.message}`));
+    });
+
+    child.on('close', (code) => {
+      if (code !== 0) {
+        reject(new Error(stderr.trim() || `dart exited with code ${code}`));
+        return;
+      }
+
+      const value = Number.parseFloat(stdout.trim());
+      if (Number.isNaN(value)) {
+        reject(new Error(`unexpected output from the Dart program: ${JSON.stringify(stdout)}`));
+        return;
+      }
+      resolve(value);
+    });
+
+    child.stdin.end(JSON.stringify(numbers));
+  });
 }
 
-// Example usage
-const numbers = [10, 20, 30, 40, 50];
-calculateAverage(numbers);
+async function main() {
+  const numbers = process.argv.length > 2
+    ? process.argv.slice(2).map(Number)
+    : [10, 20, 30, 40, 50];
+
+  try {
+    const average = await calculateAverage(numbers);
+    console.log(`The average of ${numbers.length} value(s) is: ${average.toFixed(2)}`);
+  } catch (error) {
+    console.error(`error: ${error.message}`);
+    process.exitCode = 1;
+  }
+}
+
+if (require.main === module) {
+  main();
+}
+
+module.exports = { calculateAverage };
+

@@ -1,30 +1,62 @@
 program AverageCalculator;
+
+{ Interop sample: reads numbers from a text file and prints their arithmetic
+  mean (two decimals) to standard output.
+
+  Invoked by main.pl; see README.md for build and run instructions. }
+
+{$mode objfpc}{$H+}
+
+uses
+  SysUtils;
+
 var
-   i: integer;
-   sum, average: real;
-   numbers: array[1..5] of real;
-   inputFile: Text;
-   numString: string;
-   numValue: real;
+  Input: Text;
+  Path: string;
+  Value, Total, Average: Double;
+  Count: Integer;
+
 begin
-   assign(inputFile, 'numbers.txt');
-   reset(inputFile);
-   readln(inputFile, numString);
-   close(inputFile);
+  if ParamCount < 1 then
+  begin
+    WriteLn(StdErr, 'usage: average <numbers-file>');
+    Halt(1);
+  end;
 
-   sum := 0.0;
+  Path := ParamStr(1);
 
-   i := 1;
-   while numString <> '' do
-   begin
-      val(copy(numString, 1, pos(' ', numString) - 1), numValue);
-      numbers[i] := numValue;
-      sum := sum + numbers[i];
-      delete(numString, 1, pos(' ', numString));
-      i := i + 1;
-   end;
+  { Read every number in the file, regardless of line breaks. }
+  DefaultFormatSettings.DecimalSeparator := '.';
 
-   average := sum / (i - 1);
+  {$I-}
+  Assign(Input, Path);
+  Reset(Input);
+  {$I+}
+  if IOResult <> 0 then
+  begin
+    WriteLn(StdErr, 'error: cannot open ', Path);
+    Halt(1);
+  end;
 
-   writeln(average:0:2);
+  Total := 0.0;
+  Count := 0;
+
+  while not SeekEof(Input) do
+  begin
+    Read(Input, Value);
+    Total := Total + Value;
+    Inc(Count);
+  end;
+
+  Close(Input);
+
+  if Count = 0 then
+  begin
+    WriteLn(StdErr, 'error: no numbers found in ', Path);
+    Halt(1);
+  end;
+
+  Average := Total / Count;
+  WriteLn(Average:0:2);
 end.
+

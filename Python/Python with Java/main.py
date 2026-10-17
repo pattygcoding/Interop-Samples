@@ -1,22 +1,75 @@
+#!/usr/bin/env python3
+"""Interop sample: Python driving a compiled Java program.
+
+The child process reads whitespace-separated numbers from standard input and
+writes the arithmetic mean to standard output. The JVM is started with the
+script's own directory on the classpath, so `AverageCalculator.class` is found
+no matter where the script is run from.
+
+See README.md for build and run instructions.
+"""
+
+from __future__ import annotations
+
 import subprocess
-import json
+import sys
+from pathlib import Path
 
-def calculate_average(numbers):
-    # Convert the list of numbers to a JSON string
-    numbers_json = json.dumps(numbers)
+HERE = Path(__file__).resolve().parent
+JAVA_COMMAND = ["java", "-cp", str(HERE), "AverageCalculator"]
 
-    # Run the Java program as a subprocess
+
+def calculate_average(numbers, command=JAVA_COMMAND) -> float:
+    """Return the average of ``numbers`` as computed by the Java helper."""
+    if not numbers:
+        raise ValueError("calculate_average expects a non-empty sequence")
+
+    payload = " ".join(str(number) for number in numbers)
+
     result = subprocess.run(
-        ["java", "AverageCalculator", numbers_json],
+        command,
+        input=payload,
         capture_output=True,
-        text=True
+        text=True,
+        check=False,
     )
 
-    # Get the output from the Java program
-    average = result.stdout.strip()
-    return float(average)
+    if result.returncode != 0:
+        message = result.stderr.strip() or f"helper exited with code {result.returncode}"
+        raise RuntimeError(message)
 
-# Example usage
-numbers = [10, 20, 30, 40, 50]
-average = calculate_average(numbers)
-print(f"The average is: {average}")
+    try:
+        return float(result.stdout.strip())
+    except ValueError as error:
+        raise RuntimeError(
+            f"unexpected output from the Java helper: {result.stdout!r}"
+        ) from error
+
+
+def parse_numbers(tokens) -> list[float]:
+    """Convert command-line tokens to floats, skipping anything invalid."""
+    numbers = []
+    for token in tokens:
+        try:
+            numbers.append(float(token))
+        except ValueError:
+            print(f"warning: skipping non-numeric argument {token!r}", file=sys.stderr)
+    return numbers
+
+
+def main(argv) -> int:
+    numbers = parse_numbers(argv[1:]) if len(argv) > 1 else [10, 20, 30, 40, 50]
+
+    try:
+        average = calculate_average(numbers)
+    except (ValueError, RuntimeError) as error:
+        print(f"error: {error}", file=sys.stderr)
+        return 1
+
+    print(f"The average of {len(numbers)} value(s) is: {average:.2f}")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv))
+

@@ -1,20 +1,31 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
+
+# Interop sample: Perl driving a SWI-Prolog program.
+#
+# Perl validates the input, runs `factorial.pro` with SWI-Prolog and captures
+# the factorial that Prolog writes to stdout.
+#
+# See README.md for prerequisites and run instructions.
+
 use strict;
 use warnings;
 
-# Number to calculate factorial for
-my $number = 5;
+use Cwd            qw(abs_path);
+use File::Basename qw(dirname);
 
-# Command to run the Prolog script
-my $prolog_command = "swipl -q -f factorial.pro -g main -- $number";
+my $number = @ARGV ? $ARGV[0] : 5;
 
-# Execute the Prolog script and capture the output
-my $result = `$prolog_command`;
+die "error: '$number' is not a non-negative integer\n"
+    unless $number =~ /\A\d+\z/;
 
-# Check if the result is defined and print it
-if (defined $result) {
-    chomp($result);
-    print "The factorial of $number is: $result\n";
-} else {
-    print "Failed to calculate factorial.\n";
+my $program = dirname(abs_path(__FILE__)) . '/factorial.pro';
+
+my $result = `swipl -q -f "$program" -g main -- $number`;
+if ($? != 0) {
+    die "error: Prolog failed to compute the factorial (exit $?)\n";
 }
+
+chomp $result;
+
+print "The factorial of $number is: $result\n";
+

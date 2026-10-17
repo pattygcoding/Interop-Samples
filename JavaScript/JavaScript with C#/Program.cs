@@ -1,25 +1,52 @@
 using System;
-using System.Linq;
-using Newtonsoft.Json;
+using System.Globalization;
+using System.Text.Json;
 
-class Program
+/// <summary>
+/// Interop sample: reads a JSON array of numbers from standard input and writes
+/// the arithmetic mean to standard output.
+///
+/// Invoked by <c>main.js</c>; see README.md for build and run instructions.
+/// </summary>
+internal static class Program
 {
-    static void Main(string[] args)
+    private static int Main()
     {
-        if (args.Length < 1)
+        string input = Console.In.ReadToEnd();
+
+        if (string.IsNullOrWhiteSpace(input))
         {
-            Console.WriteLine("Usage: dotnet run <json_array>");
-            return;
+            Console.Error.WriteLine("error: expected a JSON array of numbers on stdin");
+            return 1;
         }
 
-        // Parse the JSON array passed from JavaScript
-        string jsonArray = args[0];
-        double[] numbers = JsonConvert.DeserializeObject<double[]>(jsonArray);
+        try
+        {
+            double[] numbers = JsonSerializer.Deserialize<double[]>(input) ?? Array.Empty<double>();
 
-        // Calculate the average
-        double average = numbers.Average();
+            if (numbers.Length == 0)
+            {
+                Console.Error.WriteLine("error: the array is empty");
+                return 1;
+            }
 
-        // Print the average, which will be captured by the JavaScript script
-        Console.WriteLine(average);
+            double sum = 0.0;
+            foreach (double value in numbers)
+            {
+                sum += value;
+            }
+
+            double average = sum / numbers.Length;
+
+            // Invariant culture keeps the decimal separator machine-independent.
+            Console.Out.WriteLine(average.ToString("0.##########", CultureInfo.InvariantCulture));
+            return 0;
+        }
+        catch (JsonException ex)
+        {
+            Console.Error.WriteLine($"error: invalid JSON: {ex.Message}");
+            return 1;
+        }
     }
 }
+
