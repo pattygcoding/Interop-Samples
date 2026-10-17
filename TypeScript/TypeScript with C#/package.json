@@ -1,0 +1,14 @@
+{
+  "name": "interop-samples-typescript-with-csharp",
+  "version": "1.0.0",
+  "private": true,
+  "description": "TypeScript (Node.js) driving a C# program",
+  "scripts": {
+    "build": "tsc",
+    "start": "node build/main.js"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "typescript": "^5.7.0"
+  }
+}

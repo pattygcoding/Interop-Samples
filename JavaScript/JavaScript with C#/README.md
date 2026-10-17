@@ -49,7 +49,7 @@ The average of 4 value(s) is: 2.50
 result from stdout:
 
 ```js
-const child = spawn('dotnet', ['run', '--project', PROJECT, '-v', 'quiet', '--nologo'], {
+const child = spawn('dotnet', ['run', '--project', PROJECT, '-v', 'quiet'], {
   stdio: ['pipe', 'pipe', 'pipe'],
 });
 child.stdin.end(JSON.stringify(numbers));

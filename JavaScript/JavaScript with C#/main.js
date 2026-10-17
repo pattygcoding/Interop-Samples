@@ -31,7 +31,7 @@ function calculateAverage(numbers, projectPath = PROJECT) {
       return;
     }
 
-    const child = spawn('dotnet', ['run', '--project', projectPath, '-v', 'quiet', '--nologo'], {
+    const child = spawn('dotnet', ['run', '--project', projectPath, '-v', 'quiet'], {
       stdio: ['pipe', 'pipe', 'pipe'],
     });
 

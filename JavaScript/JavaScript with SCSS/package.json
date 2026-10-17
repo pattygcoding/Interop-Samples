@@ -1,0 +1,12 @@
+{
+  "name": "interop-samples-javascript-with-scss",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Node.js driving the Dart Sass compiler",
+  "scripts": {
+    "start": "node main.js"
+  },
+  "dependencies": {
+    "sass": "^1.80.0"
+  }
+}
