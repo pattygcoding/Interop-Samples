@@ -1,0 +1,30 @@
+//// Interop sample: computes the arithmetic mean of a list of numbers.
+////
+//// The list is supplied by the caller through `@use ... with ($numbers: ...)`,
+//// and the result is emitted as a CSS custom property so the host program can
+//// read it back out of the compiled CSS.
+////
+//// Invoked by main.fsx; see README.md for build and run instructions.
+
+@use "sass:list";
+@use "sass:math";
+
+$numbers: () !default;
+
+@function average($values) {
+  @if list.length($values) == 0 {
+    @error "average() needs at least one value";
+  }
+
+  $total: 0;
+
+  @each $value in $values {
+    $total: $total + $value;
+  }
+
+  @return math.div($total, list.length($values));
+}
+
+:root {
+  --average: #{average($numbers)};
+}

@@ -31,6 +31,8 @@
 # Fortran
 *.mod
 *.smod
+# Scratch file the Fortran samples write the helper's output to
+average_result.txt
 
 # Executables produced by the assembly samples (no extension on Linux)
 average

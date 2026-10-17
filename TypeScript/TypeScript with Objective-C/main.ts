@@ -60,9 +60,32 @@ function calculateAverage(numbers: number[], executable: string = EXECUTABLE): P
   });
 }
 
+/**
+ * Convert command-line tokens to numbers, skipping anything invalid.
+ *
+ * Callers pass the tokens through unchanged: converting them with `Number()`
+ * first would turn bad input into `NaN`, which the helper would then happily
+ * average as a real value.
+ */
+function parseNumbers(tokens: string[]): number[] {
+  const numbers: number[] = [];
+
+  for (const token of tokens) {
+    const value = Number(token);
+
+    if (Number.isNaN(value)) {
+      console.error(`warning: skipping non-numeric argument '${token}'`);
+    } else {
+      numbers.push(value);
+    }
+  }
+
+  return numbers;
+}
+
 async function main(): Promise<void> {
   const args = process.argv.slice(2);
-  const numbers = args.length > 0 ? args.map(Number) : [10, 20, 30, 40, 50];
+  const numbers = args.length > 0 ? parseNumbers(args) : [10, 20, 30, 40, 50];
 
   try {
     const average = await calculateAverage(numbers);
@@ -77,4 +100,4 @@ if (require.main === module) {
   main();
 }
 
-export { calculateAverage };
+export { calculateAverage, parseNumbers };

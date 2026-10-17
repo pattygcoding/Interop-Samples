@@ -19,14 +19,15 @@ reads the average it prints back from stdout.
 ## Build & run
 
 ```bash
-rustc -O main.rs -o average
+rustc -O main.rs -o average          # Windows: -o average.exe
 
 ./average                 # uses the built-in default data set
 ./average 1 2 3 4
 ./average -5 5 10
 ```
 
-On Windows the program is `average.exe`.
+`rustc` uses the `-o` name verbatim, so on Windows it needs the `.exe` suffix
+explicitly; run the program as `.\average.exe` there.
 
 You can also exercise the shell side on its own:
 

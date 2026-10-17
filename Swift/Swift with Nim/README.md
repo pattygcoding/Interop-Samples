@@ -20,15 +20,16 @@ average back from its standard output.
 
 ```bash
 nim c -d:release --hints:off -o:average_calculator average_calculator.nim
-swiftc main.swift -o average
+swiftc main.swift -o average         # Windows: -o average.exe
 
 ./average                 # uses the built-in default data set
 ./average 1 2 3 4
 ./average -5 5 10
 ```
 
-On Windows the binaries are `average_calculator.exe` and `average.exe`; `main.swift`
-detects the platform and looks for the right helper name.
+`swiftc` uses the `-o` name verbatim, so on Windows it needs the `.exe` suffix
+explicitly; run the program as `.\average.exe` there. Nim always appends `.exe`
+on Windows, and `main.swift` detects the platform to find the right helper name.
 
 You can also exercise the Nim side on its own:
 

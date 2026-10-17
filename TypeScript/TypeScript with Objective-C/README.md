@@ -63,6 +63,10 @@ const child = spawn(executable, numbers.map(String), { stdio: ['ignore', 'pipe',
 The compiled output lives in `build/`, so the helper — which sits beside the
 TypeScript source — is resolved as `path.resolve(__dirname, '..', ...)`.
 
+Arguments are converted one at a time by `parseNumbers`, which reports anything
+unparsable and drops it. Mapping the raw tokens with `Number()` would turn bad
+input into `NaN`, and the helper would then average `NaN` as if it were a value.
+
 `average_calculator.m` deliberately avoids Foundation: it declares its own root
 class and allocates it with the runtime function `class_createInstance`, so
 `libobjc` is the only library it needs. Two build details matter: `-std=gnu11`
