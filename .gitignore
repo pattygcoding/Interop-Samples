@@ -159,3 +159,12 @@ _build/
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# ---------------------------------------------------------------------------
+# Showcase site (Vue + Vite; see "Showcase site" in README.md)
+# ---------------------------------------------------------------------------
+# The built site, and the payload the generator writes for it.  `public/` itself
+# is tracked: CNAME, 404.html, the icon and the link-preview card live there, and
+# only the generated data file is left out.
+dist/
+public/interop-data.js

@@ -284,7 +284,100 @@ gcc -O2 -Wall -Wextra main.c calculate_average.o -o average
 The average of 5 value(s) is: 30.00
 ```
 
-## Planned samples
+## Showcase site
+
+Every sample is browsable as a web dashboard - the same shape as the author's
+[Connect Four showcase](https://connectfour.pattygcoding.com/), built the same way
+(Vue 3 + TypeScript + Vite + Tailwind) and served at
+**<https://interop.pattygcoding.com/>**:
+
+- **Languages** lists the 37 host languages, each with how many samples it holds.
+- **Samples** lists the 88 pairings, one row per pair: the host language in the left
+  half and the guest in the right, filterable by host language, bridge style (child
+  process, native linking, ports, in-process API, JVM bytecode, embedding) and guest
+  language.
+- Every pairing is drawn as two halves side by side - the host language and its
+  program(s) in the left half, the guest and its helper in the right, 50/50 - so the
+  interop is visible without switching files. A **Pairing** switcher in the header
+  moves a language page between the samples it hosts, which read guest-alphabetical;
+  a sample's own page opens on the alphabetically-first guest language of its host.
+- Each pairing has three tabs: **Source Code** (both halves, Prism highlighting, line
+  numbers, a copy button per file), **Docs** (the sample's own `README.md`, rendered)
+  and **Expected Output** (the fenced block from that README).
+
+```sh
+npm start          # generate the data, then run the dev server
+npm run build      # regenerate the data, type-check, write dist/
+npm run data       # only regenerate public/interop-data.js
+npm run typecheck  # vue-tsc --noEmit
+```
+
+`npm start` and `npm run build` run the generator first, so the Python command
+never has to be remembered: `tools/generate-data.mjs` finds `python3`/`python` and
+runs `tools/generate_dashboard.py` for you. That script reads the *real*
+repository - the language directories, each sample's README table and
+expected-output block, and the README's sample index for the platform column - and
+writes `public/interop-data.js`, which the page loads with a `<script>` tag (so it
+needs no fetch and no CORS). It is generated, so it is not tracked in git; a
+checkout that has not run the generator yet boots and says so.
+
+### Addresses
+
+Every language and every sample has its own address, and the sample's names the pair
+it joins: `/c` for the host language, `/c-elixir` for C driving Elixir, and
+`/c-assembly-32bit` / `/c-assembly-64bit` for the two assembly variants (a pair that
+appears twice keeps the bracket from its folder name). The sidebar entries are real
+links, so they can be copied, bookmarked or opened in a new tab. The site root (`/`)
+opens the first host language, on its alphabetically-first guest. A tab can be named
+on the path (`/c-elixir/docs`), a language page can name its pairing with `?sample=`,
+and a nested `/c/c-elixir` reads the same as the flat form.
+
+The same pairings can also be named on a subdomain - `c.interop.pattygcoding.com` for
+the language page, `c-elixir.interop.pattygcoding.com` for the sample - because the
+dashboard reads the leftmost host label when it is an id it knows and ignores
+anything else (`www`, or the apex domain itself). That only needs a wildcard `CNAME`
+(`*.interop` -> `pattygcoding.github.io`) beside the record for `interop` itself;
+without it, the path form is the one to use.
+
+GitHub Pages has no rewrite rules, so those pretty paths are backed by
+`public/404.html`: it is served for a path Pages cannot find, rebuilds the request
+as `index.html?item=<id>&tab=<tab>` and leaves the address bar untouched, and the
+page then writes the pretty path back with the History API. `?item=`, `?tab=` and
+`?sample=` are read on load in both shapes, so older links keep working.
+
+To preview the **built** site the way Pages serves it:
+
+```sh
+npm run build                     # writes dist/
+python tools/serve.py             # then open http://localhost:8000/c-elixir
+```
+
+Use that rather than `python -m http.server`: the dashboard's addresses are pretty
+paths, which are not files, and a bare file server answers them with its own 404
+page - so *refreshing* one of those screens looks broken locally even though the
+deployed site is fine.
+
+### Deploying
+
+`.github/workflows/deploy.yml` does all of it: on every push to `main` it installs
+Node 22 and Python 3.12, runs `npm ci` and `npm run build`, uploads `dist/` as the
+Pages artifact and publishes it. Publishing from an artifact needs a one-time
+setting per repository:
+
+```sh
+gh api -X PUT repos/pattygcoding/Interop-Samples/pages -f build_type=workflow
+```
+
+or **Settings -> Pages -> Build and deployment -> Source: GitHub Actions**. The
+custom domain (`interop.pattygcoding.com`, kept in `public/CNAME` for the record)
+is set the same way as for the other showcases:
+
+```sh
+gh api -X PUT repos/pattygcoding/Interop-Samples/pages -f cname=interop.pattygcoding.com
+```
+
+then point a `CNAME` record for `interop` at `pattygcoding.github.io` in DNS.
+
 
 These 25 combinations were drawn at random from a pool of 50 languages
 (`assembly` and `tiger` excluded): the pool was shuffled and consecutive entries

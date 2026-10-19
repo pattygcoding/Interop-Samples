@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interop Samples Showcase</title>
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: grid;
+            place-content: center;
+            justify-items: center;
+            gap: 0.75rem;
+            background: #05070c;
+            color: #8debc4;
+            font: 400 14px/1.6 ui-monospace, "JetBrains Mono", monospace;
+        }
+        a { color: #8debc4; }
+    </style>
+</head>
+<body>
+    <p>Opening the interop sample showcase&hellip;</p>
+    <p><a id="fallback" href="./">Continue to the showcase</a></p>
+    <noscript><p>This link needs JavaScript; open the showcase root instead.</p></noscript>
+    <script>
+        // GitHub Pages serves this file for any path it cannot find, *without* changing
+        // the address bar - which is what makes the dashboard's own links (/c,
+        // /c-elixir, plus a tolerated /c/docs) work when they are opened directly.  The
+        // request is rebuilt as the query-string shape index.html reads on load, and the
+        // page then writes the pretty path back into the bar with the History API.
+        (function () {
+            var parts = window.location.pathname.split("/").filter(Boolean);
+            var last = parts.pop() || "";
+            var tab = last === "code" || last === "docs" || last === "output" ? last : "";
+            if (tab) { last = parts.pop() || ""; }
+            // An item id is a bare slug: a language is one word (c, objectivec) and a
+            // sample is always `<host>-<guest>` (c-elixir).  Anything else - a missing
+            // .html, a directory - is junk, so drop one more level and keep climbing
+            // towards the deployment root instead of bouncing back here for ever.
+            var slug = /^[a-z0-9][a-z0-9_-]*$/.test(last) ? last : "";
+            if (!slug) { parts.pop(); }
+            // A sample id always carries the dash that joins its two languages, and the
+            // segment in front of a nested address (/c/c-elixir) is the host language
+            // that owns it - never part of the path the site is served from - so that
+            // segment is dropped too.
+            if (slug.indexOf("-") !== -1) { parts.pop(); }
+            // Anything else the link carried (?sample=, most importantly) has to survive
+            // the trip, so the dashboard can put the exact address back in the bar.
+            var params = new URLSearchParams(window.location.search || "");
+            params.delete("item");
+            // A tolerated path segment names the tab explicitly; the dashboard works out
+            // whether that item even has it and falls back to its code if not.
+            if (tab) { params.set("tab", tab); }
+            var query = params.toString();
+            // The target is built from the site root, not from the address that got here:
+            // a relative one would resolve against the junk directory this page was
+            // requested for and climb *away* from the site on every hop.  What is left in
+            // `parts` after the route has been pulled off is the directory the site is
+            // published under, so this works at the custom domain's root and under a
+            // `<user>.github.io/<repo>/` path alike.  `root` stays empty at the domain
+            // root: `"/" + "/index.html"` would read as the protocol-relative URL
+            // `//index.html` and send the browser to a host called "index.html".
+            var root = parts.length ? "/" + parts.join("/") : "";
+            var target = root + "/index.html";
+            if (slug) { target += "?item=" + encodeURIComponent(slug); }
+            if (query) { target += (slug ? "&" : "?") + query; }
+            document.getElementById("fallback").href = target;
+            // The same favicon as the dashboard, resolved the same way - so the icon
+            // shows while this page is on screen.
+            var icon = document.createElement("link");
+            icon.rel = "icon";
+            icon.type = "image/svg+xml";
+            icon.href = root + "/favicon.svg";
+            document.head.appendChild(icon);
+            // Hard stops, so a path that cannot resolve (a typo above the deployment
+            // root) shows the link rather than redirecting in circles: at most four hops,
+            // and never re-request the address we are already on.  The dashboard clears
+            // the counter as soon as it loads, so the next bad link is free to try again.
+            var hops = 0;
+            try {
+                hops = Number(sessionStorage.getItem("interop-404") || "0") + 1;
+                sessionStorage.setItem("interop-404", String(hops));
+            } catch (error) { hops = 0; }
+            if (hops > 4 || target === window.location.pathname + window.location.search) { return; }
+            window.location.replace(target);
+        })();
+    </script>
+</body>
+</html>
