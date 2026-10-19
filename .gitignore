@@ -165,6 +165,11 @@ desktop.ini
 # ---------------------------------------------------------------------------
 # The built site, and the payload the generator writes for it.  `public/` itself
 # is tracked: CNAME, 404.html, the icon and the link-preview card live there, and
-# only the generated data file is left out.
+# only the generated data file is left out.  `docs/links.md` is generated too, but
+# it is documentation and is meant to be committed.
 dist/
 public/interop-data.js
+
+# Local server logs from `npm run dev` and `tools/serve.py`.
+serve-interop.log
+vite-dev-interop.log

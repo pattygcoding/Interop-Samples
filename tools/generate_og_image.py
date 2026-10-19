@@ -44,7 +44,8 @@ def main() -> int:
     image = Image.new("RGB", (WIDTH, HEIGHT), NAVY)
     draw = ImageDraw.Draw(image)
 
-    # The thin mint rule the site's favicon shares.
+    # The thin rule in the site's accent colour - the mint the host column and the
+    # active tab use, so the card reads as the same product.
     draw.rectangle((0, 0, WIDTH, 8), fill=MINT)
 
     # Two panels facing each other: a host on the left, a guest on the right, with

@@ -66,12 +66,12 @@
             if (slug) { target += "?item=" + encodeURIComponent(slug); }
             if (query) { target += (slug ? "&" : "?") + query; }
             document.getElementById("fallback").href = target;
-            // The same favicon as the dashboard, resolved the same way - so the icon
-            // shows while this page is on screen.
+            // The same favicon as the dashboard - the portfolio's own mark - resolved the
+            // same way, so the icon shows while this page is on screen.
             var icon = document.createElement("link");
             icon.rel = "icon";
-            icon.type = "image/svg+xml";
-            icon.href = root + "/favicon.svg";
+            icon.type = "image/png";
+            icon.href = root + "/logo.png";
             document.head.appendChild(icon);
             // Hard stops, so a path that cannot resolve (a typo above the deployment
             // root) shows the link rather than redirecting in circles: at most four hops,

@@ -324,9 +324,10 @@ never has to be remembered: `tools/generate-data.mjs` finds `python3`/`python` a
 runs `tools/generate_dashboard.py` for you. That script reads the *real*
 repository - the `langs/<Language>/` directories, each sample's README table and
 expected-output block, and the README's sample index for the platform column - and
-writes `public/interop-data.js`, which the page loads with a `<script>` tag (so it
-needs no fetch and no CORS). It is generated, so it is not tracked in git; a
-checkout that has not run the generator yet boots and says so.
+writes two things from it: `public/interop-data.js`, which the page loads with a
+`<script>` tag (so it needs no fetch and no CORS), and [`docs/links.md`](docs/links.md),
+the list of every address. The payload is generated and untracked; a checkout that has
+not run the generator yet boots and says so.
 
 ### Addresses
 
@@ -346,7 +347,9 @@ host's pairings, each one a full address of its own; the list the visitor was br
 stays as it was.
 
 A tab can be named on the path (`/c-elixir/docs`), a nested `/cpp/cpp-lua` reads the
-same as the flat form, and the site root (`/`) opens the very first pairing. The same
+same as the flat form, and the site root (`/`) opens the very first pairing. **Every
+address is listed in [`docs/links.md`](docs/links.md)** - one section per host
+language, generated from the same data the dashboard reads. The same
 pairings can also be named on a subdomain - `c-elixir.interop.pattygcoding.com` for the
 sample, or `c.interop.pattygcoding.com` for that host's first one - because the
 dashboard reads the leftmost host label when it is an id it knows and ignores anything
@@ -359,6 +362,11 @@ GitHub Pages has no rewrite rules, so those pretty paths are backed by
 as `index.html?item=<id>&tab=<tab>` and leaves the address bar untouched, and the
 page then writes the pretty path back with the History API. `?item=` and `?tab=` are
 read on load in both shapes, so older links keep working.
+
+`public/logo.png` is the tab icon: the portfolio's own mark - the very file
+`pattygcoding.com` serves as its favicon, so every site in the family shows one icon.
+It is a hand-copied asset rather than a generated one, and both `index.html` and the
+shim above link it, so replacing the file is all it takes to change the icon.
 
 To preview the **built** site the way Pages serves it:
 
@@ -383,9 +391,11 @@ setting per repository:
 gh api -X PUT repos/pattygcoding/Interop-Samples/pages -f build_type=workflow
 ```
 
-or **Settings -> Pages -> Build and deployment -> Source: GitHub Actions**. The
-custom domain (`interop.pattygcoding.com`, kept in `public/CNAME` for the record)
-is set the same way as for the other showcases:
+or **Settings -> Pages -> Build and deployment -> Source: GitHub Actions**. Until that
+switch is flipped the workflow fails in its *build* job at `actions/configure-pages`
+(the log says `Get Pages site failed`), even though the DNS record may already point at
+GitHub. The custom domain (`interop.pattygcoding.com`, kept in `public/CNAME` for the
+record) is set the same way as for the other showcases:
 
 ```sh
 gh api -X PUT repos/pattygcoding/Interop-Samples/pages -f cname=interop.pattygcoding.com
