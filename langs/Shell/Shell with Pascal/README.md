@@ -50,7 +50,7 @@ The average of 4 value(s) is: 2.50
 
 ## How it works
 
-The script is deliberately **POSIX**, unlike the [Bash with Pascal](../Bash/Bash%20with%20Pascal/README.md)
+The script is deliberately **POSIX**, unlike the [Bash with Pascal](../../Bash/Bash%20with%20Pascal/README.md)
 sample: it has no arrays, so the surviving arguments are rebuilt into a string and
 then handed back to the shell with `set --`:
 

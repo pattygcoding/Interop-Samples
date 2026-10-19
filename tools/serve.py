@@ -2,23 +2,22 @@
 """Preview the built showcase the way GitHub Pages serves it.
 
 The dashboard is a built site (``npm run build`` writes ``dist/``), and its
-addresses are pretty paths (`/ada`, `/ada-with-java`) that are not files.  Pages
-has no rewrite rules either: it answers an unknown path with the site's own
-``404.html``, and the tiny shim in that file sends the browser on to
-``index.html?item=<id>``.  That is what makes *refreshing* one of those screens
-work on the deployed site.
+addresses are pretty paths (`/c`, `/c-elixir`) that are not files.  Pages has no
+rewrite rules either: it answers an unknown path with the site's own ``404.html``,
+and the tiny shim in that file sends the browser on to ``index.html?item=<id>``.
+That is what makes *refreshing* one of those screens work on the deployed site.
 
-``python -m http.server`` does not do that - it answers ``/ada`` with its own
-404 page - so a refresh looks broken locally even though production is fine.
-This server mirrors Pages instead: unknown paths get ``404.html`` with a 404
-status, everything else is served from ``dist/``, and the shim in the browser
-finishes the job.  Before the first build it falls back to serving the repository
-itself, which the dashboard's own static files are enough for.
+``python -m http.server`` does not do that - it answers ``/c`` with its own 404
+page - so a refresh looks broken locally even though production is fine.  This
+server mirrors Pages instead: unknown paths get ``404.html`` with a 404 status,
+everything else is served from ``dist/``, and the shim in the browser finishes the
+job.  Before the first build it falls back to serving the repository itself, which
+the dashboard's own static files are enough for.
 
 Usage::
 
     npm run build                    # once, so dist/ exists
-    python tools/serve.py [port]     # then open http://localhost:8000/ada
+    python tools/serve.py [port]     # then open http://localhost:8000/c-elixir
 """
 
 from __future__ import annotations
@@ -108,7 +107,7 @@ def main() -> int:
         if SERVE_ROOT is ROOT:
             print("  (no dist/ yet - run `npm run build` to serve the real thing)")
         print("  http://localhost:%d/               (opens the default language)" % port)
-        print("  http://localhost:%d/ada-with-java  (404.html fallback, like Pages)" % port)
+        print("  http://localhost:%d/c-elixir       (404.html fallback, like Pages)" % port)
         try:
             server.serve_forever()
         except KeyboardInterrupt:

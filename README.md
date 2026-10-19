@@ -17,94 +17,94 @@ and the expected output.
 
 | Sample | Host | Guest | Bridge | Platform |
 | --- | --- | --- | --- | --- |
-| [Ada with Java](Ada/Ada%20with%20Java/README.md) | Ada | Java | Child process + argv/stdout | Any |
-| [Ada with JavaScript](Ada/Ada%20with%20JavaScript/README.md) | Ada | JavaScript (Node.js) | Child process + stdin/stdout | Any |
-| [Ada with Kotlin](Ada/Ada%20with%20Kotlin/README.md) | Ada | Kotlin | Child process + stdin/stdout | Any |
-| [Ada with Lisp](Ada/Ada%20with%20Lisp/README.md) | Ada | Common Lisp (SBCL) | Child process + stdin/stdout | Any |
-| [Ada with SQL](Ada/Ada%20with%20SQL/README.md) | Ada | SQL (SQLite) | Child process + `sqlite3` shell | Any |
-| [Bash with Pascal](Bash/Bash%20with%20Pascal/README.md) | Bash | Free Pascal | Child process + argv/stdout | Any |
-| [C with Assembly (32-bit)](C/C%20with%20Assembly%20(32bit)/README.md) | C | x86-32 assembly | Native linking, `cdecl` | Linux, Windows |
-| [C with Assembly (64-bit)](C/C%20with%20Assembly%20(64bit)/README.md) | C | x86-64 assembly | Native linking, System V / MS x64 ABI | Linux, Windows |
-| [C with Elixir](C/C%20with%20Elixir/README.md) | C | Elixir | Child process + `popen` pipe | Any |
-| [C with PHP](C/C%20with%20PHP/README.md) | C | PHP | Child process + `popen` pipe | Any |
-| [C with Python](C/C%20with%20Python/README.md) | C | Python 3 | Child process + `popen` pipe | Any |
-| [C++ with Assembly (32-bit)](C%2B%2B/C%2B%2B%20with%20Assembly%20(32bit)/README.md) | C++ | x86-32 assembly | Native linking, `extern "C"` | Linux, Windows |
-| [C++ with Assembly (64-bit)](C%2B%2B/C%2B%2B%20with%20Assembly%20(64bit)/README.md) | C++ | x86-64 assembly | Native linking, `extern "C"` | Linux, Windows |
-| [C++ with C](C%2B%2B/C%2B%2B%20with%20C/README.md) | C++ | C | Child process + `popen` pipe | Any |
-| [C++ with Lua](C%2B%2B/C%2B%2B%20with%20Lua/README.md) | C++ | Lua | Child process + `popen` pipe | Any |
-| [Clojure with Lua](Clojure/Clojure%20with%20Lua/README.md) | Clojure | Lua | Child process + argv/stdout | Any |
-| [Clojure with PowerShell](Clojure/Clojure%20with%20PowerShell/README.md) | Clojure | PowerShell | Child process + argv/stdout | Any |
-| [Dart with Haskell](Dart/Dart%20with%20Haskell/README.md) | Dart | Haskell | Child process + argv/stdout | Any |
-| [Dart with Python](Dart/Dart%20with%20Python/README.md) | Dart | Python 3 | Child process + argv/stdout | Any |
-| [Elixir with Fortran](Elixir/Elixir%20with%20Fortran/README.md) | Elixir | Fortran | Child process + argv/stdout | Any |
-| [Elm with D](Elm/Elm%20with%20D/README.md) | Elm | D | Ports + Node host, child process | Any |
-| [Elm with Prolog](Elm/Elm%20with%20Prolog/README.md) | Elm | SWI-Prolog | Ports + Node host, child process | Any |
-| [Elm with Scala](Elm/Elm%20with%20Scala/README.md) | Elm | Scala 3 | Ports + Node host, child process | Any |
-| [Elm with Swift](Elm/Elm%20with%20Swift/README.md) | Elm | Swift | Ports + Node host, child process | Any |
-| [Erlang with Haskell](Erlang/Erlang%20with%20Haskell/README.md) | Erlang | Haskell | Erlang port + argv/stdout | Any |
-| [F# with Lisp](F%23/F%23%20with%20Lisp/README.md) | F# | Common Lisp (SBCL) | Child process + stdin/stdout | Any |
-| [F# with SCSS](F%23/F%23%20with%20SCSS/README.md) | F# | SCSS (Dart Sass) | Child process + generated CSS | Any |
-| [Fortran with COBOL](Fortran/Fortran%20with%20COBOL/README.md) | Fortran | COBOL (GnuCOBOL) | Child process + shell redirection | Linux |
-| [Fortran with Java](Fortran/Fortran%20with%20Java/README.md) | Fortran | Java | Child process + shell redirection | Any |
-| [Go with Prolog](Go/Go%20with%20Prolog/README.md) | Go | SWI-Prolog | Child process + argv/stdout | Any |
-| [Go with Scala](Go/Go%20with%20Scala/README.md) | Go | Scala 3 | Child process + argv/stdout | Any |
-| [Groovy with C](Groovy/Groovy%20with%20C/README.md) | Groovy | C | Child process + argv/stdout | Any |
-| [Groovy with Objective-C](Groovy/Groovy%20with%20Objective-C/README.md) | Groovy | Objective-C | Child process + argv/stdout | Any |
-| [Groovy with Shell](Groovy/Groovy%20with%20Shell/README.md) | Groovy | Shell (POSIX `sh`) | Child process + argv/stdout | Any |
-| [Haskell with Assembly (32-bit)](Haskell/Haskell%20with%20Assembly%20(32bit)/README.md) | Haskell | x86-32 assembly | Child process + text files | Linux i386 |
-| [Haskell with Assembly (64-bit)](Haskell/Haskell%20with%20Assembly%20(64bit)/README.md) | Haskell | x86-64 assembly | Child process + text files | Linux x86-64 |
-| [Haskell with Clojure](Haskell/Haskell%20with%20Clojure/README.md) | Haskell | Clojure | Child process + argv/stdout | Any |
-| [Haskell with Nim](Haskell/Haskell%20with%20Nim/README.md) | Haskell | Nim | Child process + argv/stdout | Any |
-| [Haskell with Scala](Haskell/Haskell%20with%20Scala/README.md) | Haskell | Scala 3 | Child process + stdin/stdout | Any |
-| [Haxe with Erlang](Haxe/Haxe%20with%20Erlang/README.md) | Haxe (Neko) | Erlang | Child process + argv/stdout | Any |
-| [Haxe with Groovy](Haxe/Haxe%20with%20Groovy/README.md) | Haxe (Neko) | Groovy | Child process + argv/stdout | Any |
-| [Haxe with Perl](Haxe/Haxe%20with%20Perl/README.md) | Haxe (Neko) | Perl | Child process + argv/stdout | Any |
-| [Haxe with SCSS](Haxe/Haxe%20with%20SCSS/README.md) | Haxe (Neko) | SCSS (Dart Sass) | Child process + generated CSS | Any |
-| [Java with C#](Java/Java%20with%20C%23/README.md) | Java | C# (.NET) | Child process + JSON on stdin/stdout | Any |
-| [Java with Clojure](Java/Java%20with%20Clojure/README.md) | Java | Clojure | In-process JVM API | Any (JVM) |
-| [Java with Groovy](Java/Java%20with%20Groovy/README.md) | Java | Groovy | Shared JVM bytecode | Any (JVM) |
-| [Java with Kotlin](Java/Java%20with%20Kotlin/README.md) | Java | Kotlin | Shared JVM bytecode | Any (JVM) |
-| [Java with Scala](Java/Java%20with%20Scala/README.md) | Java | Scala 3 | Shared JVM bytecode | Any (JVM) |
-| [JavaScript with C#](JavaScript/JavaScript%20with%20C%23/README.md) | Node.js | C# (.NET) | Child process + JSON on stdin/stdout | Any |
-| [JavaScript with Dart](JavaScript/JavaScript%20with%20Dart/README.md) | Node.js | Dart | Child process + JSON on stdin/stdout | Any |
-| [JavaScript with Perl](JavaScript/JavaScript%20with%20Perl/README.md) | Node.js | Perl | Child process + argv/stdout | Any |
-| [JavaScript with SCSS](JavaScript/JavaScript%20with%20SCSS/README.md) | Node.js | SCSS (Dart Sass) | In-process Sass compiler | Any |
-| [JavaScript with SQL](JavaScript/JavaScript%20with%20SQL/README.md) | Node.js | SQL (SQLite) | Child process + `sqlite3` shell | Any |
-| [Julia with SQL](Julia/Julia%20with%20SQL/README.md) | Julia | SQL (SQLite) | Child process + `sqlite3` shell | Any |
-| [Kotlin with Prolog](Kotlin/Kotlin%20with%20Prolog/README.md) | Kotlin | SWI-Prolog | Child process + argv/stdout | Any |
-| [Lua with R](Lua/Lua%20with%20R/README.md) | Lua | R | Child process + `io.popen` pipe | Any |
-| [Lua with Swift](Lua/Lua%20with%20Swift/README.md) | Lua | Swift | Child process + `io.popen` pipe | Any |
-| [Nim with PHP](Nim/Nim%20with%20PHP/README.md) | Nim | PHP | Child process + argv/stdout | Any |
-| [Nim with R](Nim/Nim%20with%20R/README.md) | Nim | R | Child process + argv/stdout | Any |
-| [OCaml with Go](OCaml/OCaml%20with%20Go/README.md) | OCaml | Go | Child process + temporary files | Any |
-| [OCaml with Objective-C](OCaml/OCaml%20with%20Objective-C/README.md) | OCaml | Objective-C | Child process + shell redirection | Any |
-| [OCaml with SCSS](OCaml/OCaml%20with%20SCSS/README.md) | OCaml | SCSS (Dart Sass) | Child process + generated CSS | Any |
-| [Objective-C with Lisp](Objective-C/Objective-C%20with%20Lisp/README.md) | Objective-C | Common Lisp (SBCL) | Child process + `popen` pipe | Any |
-| [Pascal with Rust](Pascal/Pascal%20with%20Rust/README.md) | Free Pascal | Rust | Child process + argv/stdout | Any |
-| [Perl with Pascal](Perl/Perl%20with%20Pascal/README.md) | Perl | Free Pascal | Child process + temporary file | Any |
-| [Perl with Prolog](Perl/Perl%20with%20Prolog/README.md) | Perl | SWI-Prolog | Child process + argv/stdout | Any |
-| [PHP with Dart](PHP/PHP%20with%20Dart/README.md) | PHP | Dart | Child process + argv/stdout | Any |
-| [PowerShell with V](PowerShell/PowerShell%20with%20V/README.md) | PowerShell | V | Child process + argv/stdout | Any |
-| [Python with C++](Python/Python%20with%20C%2B%2B/README.md) | Python | C++17 | Child process + stdin/stdout | Any |
-| [Python with Java](Python/Python%20with%20Java/README.md) | Python | Java | Child process + stdin/stdout | Any |
-| [Python with Prolog](Python/Python%20with%20Prolog/README.md) | Python | SWI-Prolog | In-process embedding (PySwip) | Any |
-| [Python with SCSS](Python/Python%20with%20SCSS/README.md) | Python | SCSS (Dart Sass) | Child process + generated CSS | Any |
-| [R with PHP](R/R%20with%20PHP/README.md) | R | PHP | Child process + argv/stdout | Any |
-| [Ruby with Rust](Ruby/Ruby%20with%20Rust/README.md) | Ruby | Rust | Child process + stdin/stdout | Any |
-| [Rust with Lisp](Rust/Rust%20with%20Lisp/README.md) | Rust | Common Lisp (SBCL) | Child process + argv/stdout | Any |
-| [Rust with Shell](Rust/Rust%20with%20Shell/README.md) | Rust | Shell (POSIX `sh`) | Child process + argv/stdout | Any |
-| [Scala with Julia](Scala/Scala%20with%20Julia/README.md) | Scala 3 | Julia | Child process + argv/stdout | Any |
-| [Scala with VB / VB.NET](Scala/Scala%20with%20VB.NET/README.md) | Scala 3 | VB.NET | Child process + argv/stdout | Any |
-| [Shell with Pascal](Shell/Shell%20with%20Pascal/README.md) | Shell | Free Pascal | Child process + argv/stdout | Any |
-| [Shell with VB.NET](Shell/Shell%20with%20VB.NET/README.md) | Shell | VB.NET | Child process + argv/stdout | Any |
-| [Swift with Nim](Swift/Swift%20with%20Nim/README.md) | Swift | Nim | Child process + stdin/stdout | Any |
-| [Swift with Ruby](Swift/Swift%20with%20Ruby/README.md) | Swift | Ruby | Child process + argv/stdout | Any |
-| [TypeScript with C#](TypeScript/TypeScript%20with%20C%23/README.md) | TypeScript (Node.js) | C# (.NET) | Child process + argv/stdout | Any |
-| [TypeScript with Objective-C](TypeScript/TypeScript%20with%20Objective-C/README.md) | TypeScript (Node.js) | Objective-C | Child process + argv/stdout | Any |
-| [TypeScript with Python](TypeScript/TypeScript%20with%20Python/README.md) | TypeScript (Node.js) | Python 3 | Child process + JSON on stdin/stdout | Any |
-| [V with C++](V/V%20with%20C%2B%2B/README.md) | V | C++17 | Child process + argv/stdout | Any |
-| [V with R](V/V%20with%20R/README.md) | V | R | Child process + argv/stdout | Any |
-| [VB / VB.NET with D](VB.NET/VB.NET%20with%20D/README.md) | VB.NET | D | Child process + argv/stdout | Any |
+| [Ada with Java](langs/Ada/Ada%20with%20Java/README.md) | Ada | Java | Child process + argv/stdout | Any |
+| [Ada with JavaScript](langs/Ada/Ada%20with%20JavaScript/README.md) | Ada | JavaScript (Node.js) | Child process + stdin/stdout | Any |
+| [Ada with Kotlin](langs/Ada/Ada%20with%20Kotlin/README.md) | Ada | Kotlin | Child process + stdin/stdout | Any |
+| [Ada with Lisp](langs/Ada/Ada%20with%20Lisp/README.md) | Ada | Common Lisp (SBCL) | Child process + stdin/stdout | Any |
+| [Ada with SQL](langs/Ada/Ada%20with%20SQL/README.md) | Ada | SQL (SQLite) | Child process + `sqlite3` shell | Any |
+| [Bash with Pascal](langs/Bash/Bash%20with%20Pascal/README.md) | Bash | Free Pascal | Child process + argv/stdout | Any |
+| [C with Assembly (32-bit)](langs/C/C%20with%20Assembly%20(32bit)/README.md) | C | x86-32 assembly | Native linking, `cdecl` | Linux, Windows |
+| [C with Assembly (64-bit)](langs/C/C%20with%20Assembly%20(64bit)/README.md) | C | x86-64 assembly | Native linking, System V / MS x64 ABI | Linux, Windows |
+| [C with Elixir](langs/C/C%20with%20Elixir/README.md) | C | Elixir | Child process + `popen` pipe | Any |
+| [C with PHP](langs/C/C%20with%20PHP/README.md) | C | PHP | Child process + `popen` pipe | Any |
+| [C with Python](langs/C/C%20with%20Python/README.md) | C | Python 3 | Child process + `popen` pipe | Any |
+| [C++ with Assembly (32-bit)](langs/C%2B%2B/C%2B%2B%20with%20Assembly%20(32bit)/README.md) | C++ | x86-32 assembly | Native linking, `extern "C"` | Linux, Windows |
+| [C++ with Assembly (64-bit)](langs/C%2B%2B/C%2B%2B%20with%20Assembly%20(64bit)/README.md) | C++ | x86-64 assembly | Native linking, `extern "C"` | Linux, Windows |
+| [C++ with C](langs/C%2B%2B/C%2B%2B%20with%20C/README.md) | C++ | C | Child process + `popen` pipe | Any |
+| [C++ with Lua](langs/C%2B%2B/C%2B%2B%20with%20Lua/README.md) | C++ | Lua | Child process + `popen` pipe | Any |
+| [Clojure with Lua](langs/Clojure/Clojure%20with%20Lua/README.md) | Clojure | Lua | Child process + argv/stdout | Any |
+| [Clojure with PowerShell](langs/Clojure/Clojure%20with%20PowerShell/README.md) | Clojure | PowerShell | Child process + argv/stdout | Any |
+| [Dart with Haskell](langs/Dart/Dart%20with%20Haskell/README.md) | Dart | Haskell | Child process + argv/stdout | Any |
+| [Dart with Python](langs/Dart/Dart%20with%20Python/README.md) | Dart | Python 3 | Child process + argv/stdout | Any |
+| [Elixir with Fortran](langs/Elixir/Elixir%20with%20Fortran/README.md) | Elixir | Fortran | Child process + argv/stdout | Any |
+| [Elm with D](langs/Elm/Elm%20with%20D/README.md) | Elm | D | Ports + Node host, child process | Any |
+| [Elm with Prolog](langs/Elm/Elm%20with%20Prolog/README.md) | Elm | SWI-Prolog | Ports + Node host, child process | Any |
+| [Elm with Scala](langs/Elm/Elm%20with%20Scala/README.md) | Elm | Scala 3 | Ports + Node host, child process | Any |
+| [Elm with Swift](langs/Elm/Elm%20with%20Swift/README.md) | Elm | Swift | Ports + Node host, child process | Any |
+| [Erlang with Haskell](langs/Erlang/Erlang%20with%20Haskell/README.md) | Erlang | Haskell | Erlang port + argv/stdout | Any |
+| [F# with Lisp](langs/F%23/F%23%20with%20Lisp/README.md) | F# | Common Lisp (SBCL) | Child process + stdin/stdout | Any |
+| [F# with SCSS](langs/F%23/F%23%20with%20SCSS/README.md) | F# | SCSS (Dart Sass) | Child process + generated CSS | Any |
+| [Fortran with COBOL](langs/Fortran/Fortran%20with%20COBOL/README.md) | Fortran | COBOL (GnuCOBOL) | Child process + shell redirection | Linux |
+| [Fortran with Java](langs/Fortran/Fortran%20with%20Java/README.md) | Fortran | Java | Child process + shell redirection | Any |
+| [Go with Prolog](langs/Go/Go%20with%20Prolog/README.md) | Go | SWI-Prolog | Child process + argv/stdout | Any |
+| [Go with Scala](langs/Go/Go%20with%20Scala/README.md) | Go | Scala 3 | Child process + argv/stdout | Any |
+| [Groovy with C](langs/Groovy/Groovy%20with%20C/README.md) | Groovy | C | Child process + argv/stdout | Any |
+| [Groovy with Objective-C](langs/Groovy/Groovy%20with%20Objective-C/README.md) | Groovy | Objective-C | Child process + argv/stdout | Any |
+| [Groovy with Shell](langs/Groovy/Groovy%20with%20Shell/README.md) | Groovy | Shell (POSIX `sh`) | Child process + argv/stdout | Any |
+| [Haskell with Assembly (32-bit)](langs/Haskell/Haskell%20with%20Assembly%20(32bit)/README.md) | Haskell | x86-32 assembly | Child process + text files | Linux i386 |
+| [Haskell with Assembly (64-bit)](langs/Haskell/Haskell%20with%20Assembly%20(64bit)/README.md) | Haskell | x86-64 assembly | Child process + text files | Linux x86-64 |
+| [Haskell with Clojure](langs/Haskell/Haskell%20with%20Clojure/README.md) | Haskell | Clojure | Child process + argv/stdout | Any |
+| [Haskell with Nim](langs/Haskell/Haskell%20with%20Nim/README.md) | Haskell | Nim | Child process + argv/stdout | Any |
+| [Haskell with Scala](langs/Haskell/Haskell%20with%20Scala/README.md) | Haskell | Scala 3 | Child process + stdin/stdout | Any |
+| [Haxe with Erlang](langs/Haxe/Haxe%20with%20Erlang/README.md) | Haxe (Neko) | Erlang | Child process + argv/stdout | Any |
+| [Haxe with Groovy](langs/Haxe/Haxe%20with%20Groovy/README.md) | Haxe (Neko) | Groovy | Child process + argv/stdout | Any |
+| [Haxe with Perl](langs/Haxe/Haxe%20with%20Perl/README.md) | Haxe (Neko) | Perl | Child process + argv/stdout | Any |
+| [Haxe with SCSS](langs/Haxe/Haxe%20with%20SCSS/README.md) | Haxe (Neko) | SCSS (Dart Sass) | Child process + generated CSS | Any |
+| [Java with C#](langs/Java/Java%20with%20C%23/README.md) | Java | C# (.NET) | Child process + JSON on stdin/stdout | Any |
+| [Java with Clojure](langs/Java/Java%20with%20Clojure/README.md) | Java | Clojure | In-process JVM API | Any (JVM) |
+| [Java with Groovy](langs/Java/Java%20with%20Groovy/README.md) | Java | Groovy | Shared JVM bytecode | Any (JVM) |
+| [Java with Kotlin](langs/Java/Java%20with%20Kotlin/README.md) | Java | Kotlin | Shared JVM bytecode | Any (JVM) |
+| [Java with Scala](langs/Java/Java%20with%20Scala/README.md) | Java | Scala 3 | Shared JVM bytecode | Any (JVM) |
+| [JavaScript with C#](langs/JavaScript/JavaScript%20with%20C%23/README.md) | Node.js | C# (.NET) | Child process + JSON on stdin/stdout | Any |
+| [JavaScript with Dart](langs/JavaScript/JavaScript%20with%20Dart/README.md) | Node.js | Dart | Child process + JSON on stdin/stdout | Any |
+| [JavaScript with Perl](langs/JavaScript/JavaScript%20with%20Perl/README.md) | Node.js | Perl | Child process + argv/stdout | Any |
+| [JavaScript with SCSS](langs/JavaScript/JavaScript%20with%20SCSS/README.md) | Node.js | SCSS (Dart Sass) | In-process Sass compiler | Any |
+| [JavaScript with SQL](langs/JavaScript/JavaScript%20with%20SQL/README.md) | Node.js | SQL (SQLite) | Child process + `sqlite3` shell | Any |
+| [Julia with SQL](langs/Julia/Julia%20with%20SQL/README.md) | Julia | SQL (SQLite) | Child process + `sqlite3` shell | Any |
+| [Kotlin with Prolog](langs/Kotlin/Kotlin%20with%20Prolog/README.md) | Kotlin | SWI-Prolog | Child process + argv/stdout | Any |
+| [Lua with R](langs/Lua/Lua%20with%20R/README.md) | Lua | R | Child process + `io.popen` pipe | Any |
+| [Lua with Swift](langs/Lua/Lua%20with%20Swift/README.md) | Lua | Swift | Child process + `io.popen` pipe | Any |
+| [Nim with PHP](langs/Nim/Nim%20with%20PHP/README.md) | Nim | PHP | Child process + argv/stdout | Any |
+| [Nim with R](langs/Nim/Nim%20with%20R/README.md) | Nim | R | Child process + argv/stdout | Any |
+| [OCaml with Go](langs/OCaml/OCaml%20with%20Go/README.md) | OCaml | Go | Child process + temporary files | Any |
+| [OCaml with Objective-C](langs/OCaml/OCaml%20with%20Objective-C/README.md) | OCaml | Objective-C | Child process + shell redirection | Any |
+| [OCaml with SCSS](langs/OCaml/OCaml%20with%20SCSS/README.md) | OCaml | SCSS (Dart Sass) | Child process + generated CSS | Any |
+| [Objective-C with Lisp](langs/Objective-C/Objective-C%20with%20Lisp/README.md) | Objective-C | Common Lisp (SBCL) | Child process + `popen` pipe | Any |
+| [Pascal with Rust](langs/Pascal/Pascal%20with%20Rust/README.md) | Free Pascal | Rust | Child process + argv/stdout | Any |
+| [Perl with Pascal](langs/Perl/Perl%20with%20Pascal/README.md) | Perl | Free Pascal | Child process + temporary file | Any |
+| [Perl with Prolog](langs/Perl/Perl%20with%20Prolog/README.md) | Perl | SWI-Prolog | Child process + argv/stdout | Any |
+| [PHP with Dart](langs/PHP/PHP%20with%20Dart/README.md) | PHP | Dart | Child process + argv/stdout | Any |
+| [PowerShell with V](langs/PowerShell/PowerShell%20with%20V/README.md) | PowerShell | V | Child process + argv/stdout | Any |
+| [Python with C++](langs/Python/Python%20with%20C%2B%2B/README.md) | Python | C++17 | Child process + stdin/stdout | Any |
+| [Python with Java](langs/Python/Python%20with%20Java/README.md) | Python | Java | Child process + stdin/stdout | Any |
+| [Python with Prolog](langs/Python/Python%20with%20Prolog/README.md) | Python | SWI-Prolog | In-process embedding (PySwip) | Any |
+| [Python with SCSS](langs/Python/Python%20with%20SCSS/README.md) | Python | SCSS (Dart Sass) | Child process + generated CSS | Any |
+| [R with PHP](langs/R/R%20with%20PHP/README.md) | R | PHP | Child process + argv/stdout | Any |
+| [Ruby with Rust](langs/Ruby/Ruby%20with%20Rust/README.md) | Ruby | Rust | Child process + stdin/stdout | Any |
+| [Rust with Lisp](langs/Rust/Rust%20with%20Lisp/README.md) | Rust | Common Lisp (SBCL) | Child process + argv/stdout | Any |
+| [Rust with Shell](langs/Rust/Rust%20with%20Shell/README.md) | Rust | Shell (POSIX `sh`) | Child process + argv/stdout | Any |
+| [Scala with Julia](langs/Scala/Scala%20with%20Julia/README.md) | Scala 3 | Julia | Child process + argv/stdout | Any |
+| [Scala with VB / VB.NET](langs/Scala/Scala%20with%20VB.NET/README.md) | Scala 3 | VB.NET | Child process + argv/stdout | Any |
+| [Shell with Pascal](langs/Shell/Shell%20with%20Pascal/README.md) | Shell | Free Pascal | Child process + argv/stdout | Any |
+| [Shell with VB.NET](langs/Shell/Shell%20with%20VB.NET/README.md) | Shell | VB.NET | Child process + argv/stdout | Any |
+| [Swift with Nim](langs/Swift/Swift%20with%20Nim/README.md) | Swift | Nim | Child process + stdin/stdout | Any |
+| [Swift with Ruby](langs/Swift/Swift%20with%20Ruby/README.md) | Swift | Ruby | Child process + argv/stdout | Any |
+| [TypeScript with C#](langs/TypeScript/TypeScript%20with%20C%23/README.md) | TypeScript (Node.js) | C# (.NET) | Child process + argv/stdout | Any |
+| [TypeScript with Objective-C](langs/TypeScript/TypeScript%20with%20Objective-C/README.md) | TypeScript (Node.js) | Objective-C | Child process + argv/stdout | Any |
+| [TypeScript with Python](langs/TypeScript/TypeScript%20with%20Python/README.md) | TypeScript (Node.js) | Python 3 | Child process + JSON on stdin/stdout | Any |
+| [V with C++](langs/V/V%20with%20C%2B%2B/README.md) | V | C++17 | Child process + argv/stdout | Any |
+| [V with R](langs/V/V%20with%20R/README.md) | V | R | Child process + argv/stdout | Any |
+| [VB / VB.NET with D](langs/VB.NET/VB.NET%20with%20D/README.md) | VB.NET | D | Child process + argv/stdout | Any |
 
 ## Conventions
 
@@ -227,54 +227,62 @@ Install only the toolchains for the samples you want to run.
 
 ## Repository layout
 
+Every host language is a folder in `langs/`, and each sample lives in a folder
+beside it, named after the pair it joins:
+
 ```text
 .
-├── Ada/          Ada + Java, JavaScript, Kotlin, Lisp, and SQL
-├── Bash/         Bash + Pascal
-├── C/            C + x86 assembly (32-bit and 64-bit), C + Elixir, C + PHP, C + Python
-├── C++/          C++ + x86 assembly (32-bit and 64-bit), C++ + C, and C++ + Lua
-├── Clojure/      Clojure + Lua, and Clojure + PowerShell
-├── Dart/         Dart + Haskell, and Dart + Python
-├── Elixir/       Elixir + Fortran
-├── Elm/          Elm + D, Prolog, Scala, and Swift
-├── Erlang/       Erlang + Haskell
-├── F#/           F# + Lisp, and F# + SCSS
-├── Fortran/      Fortran + COBOL, and Fortran + Java
-├── Go/           Go + Prolog, and Go + Scala
-├── Groovy/       Groovy + C, Objective-C, and Shell
-├── Haskell/      Haskell + assembly, Clojure, Nim, and Scala
-├── Haxe/         Haxe + Erlang, Groovy, Perl, and SCSS
-├── Java/         Java + C#, Clojure, Groovy, Kotlin, Scala
-├── JavaScript/   Node.js + C#, Dart, Perl, SCSS, and SQL
-├── Julia/        Julia + SQL
-├── Kotlin/       Kotlin + Prolog
-├── Lua/          Lua + R, and Lua + Swift
-├── Nim/          Nim + PHP, and Nim + R
-├── OCaml/        OCaml + Go, Objective-C, and SCSS
-├── Objective-C/  Objective-C + Lisp
-├── Pascal/       Pascal + Rust
-├── Perl/         Perl + Pascal, and Perl + Prolog
-├── PHP/          PHP + Dart
-├── PowerShell/   PowerShell + V
-├── Python/       Python + C++, Java, Prolog, and SCSS
-├── R/            R + PHP
-├── Ruby/         Ruby + Rust
-├── Rust/         Rust + Lisp, and Rust + Shell
-├── Scala/        Scala + Julia, and Scala + VB.NET
-├── Shell/        Shell + Pascal, and Shell + VB.NET
-├── Swift/        Swift + Nim, and Swift + Ruby
-├── TypeScript/   TypeScript + C#, Objective-C, and Python
-├── V/            V + C++, and V + R
-└── VB.NET/       VB.NET + D
+├── langs/
+│   ├── Ada/            Ada + Java, JavaScript, Kotlin, Lisp, and SQL
+│   │   ├── Ada with Java/        (one sample: its programs + its README)
+│   │   └── ...
+│   ├── Bash/           Bash + Pascal
+│   ├── C/              C + x86 assembly (32-bit and 64-bit), C + Elixir, C + PHP, C + Python
+│   ├── C++/            C++ + x86 assembly (32-bit and 64-bit), C++ + C, and C++ + Lua
+│   ├── Clojure/        Clojure + Lua, and Clojure + PowerShell
+│   ├── Dart/           Dart + Haskell, and Dart + Python
+│   ├── Elixir/         Elixir + Fortran
+│   ├── Elm/            Elm + D, Prolog, Scala, and Swift
+│   ├── Erlang/         Erlang + Haskell
+│   ├── F#/             F# + Lisp, and F# + SCSS
+│   ├── Fortran/        Fortran + COBOL, and Fortran + Java
+│   ├── Go/             Go + Prolog, and Go + Scala
+│   ├── Groovy/         Groovy + C, Objective-C, and Shell
+│   ├── Haskell/        Haskell + assembly, Clojure, Nim, and Scala
+│   ├── Haxe/           Haxe + Erlang, Groovy, Perl, and SCSS
+│   ├── Java/           Java + C#, Clojure, Groovy, Kotlin, Scala
+│   ├── JavaScript/     Node.js + C#, Dart, Perl, SCSS, and SQL
+│   ├── Julia/          Julia + SQL
+│   ├── Kotlin/         Kotlin + Prolog
+│   ├── Lua/            Lua + R, and Lua + Swift
+│   ├── Nim/            Nim + PHP, and Nim + R
+│   ├── OCaml/          OCaml + Go, Objective-C, and SCSS
+│   ├── Objective-C/    Objective-C + Lisp
+│   ├── Pascal/         Pascal + Rust
+│   ├── Perl/           Perl + Pascal, and Perl + Prolog
+│   ├── PHP/            PHP + Dart
+│   ├── PowerShell/     PowerShell + V
+│   ├── Python/         Python + C++, Java, Prolog, and SCSS
+│   ├── R/              R + PHP
+│   ├── Ruby/           Ruby + Rust
+│   ├── Rust/           Rust + Lisp, and Rust + Shell
+│   ├── Scala/          Scala + Julia, and Scala + VB.NET
+│   ├── Shell/          Shell + Pascal, and Shell + VB.NET
+│   ├── Swift/          Swift + Nim, and Swift + Ruby
+│   ├── TypeScript/     TypeScript + C#, Objective-C, and Python
+│   ├── V/              V + C++, and V + R
+│   └── VB.NET/         VB.NET + D
+├── public/, src/, tools/, index.html ...   the showcase site (see below)
+└── README.md
 ```
 
 ## Getting started
 
-Pick any folder, open its `README.md`, and follow the build and run steps. For
-example:
+Pick any sample folder, open its `README.md`, and follow the build and run steps.
+For example:
 
 ```bash
-cd "C/C with Assembly (64bit)"
+cd "langs/C/C with Assembly (64bit)"
 nasm -f elf64 calculate_average.asm -o calculate_average.o
 gcc -O2 -Wall -Wextra main.c calculate_average.o -o average
 ./average
@@ -298,9 +306,8 @@ Every sample is browsable as a web dashboard - the same shape as the author's
   language.
 - Every pairing is drawn as two halves side by side - the host language and its
   program(s) in the left half, the guest and its helper in the right, 50/50 - so the
-  interop is visible without switching files. A **Pairing** switcher in the header
-  moves a language page between the samples it hosts, which read guest-alphabetical;
-  a sample's own page opens on the alphabetically-first guest language of its host.
+  interop is visible without switching files. The pairings read guest-alphabetical, and
+  a **Pairing** switcher in the header moves a host's page between them.
 - Each pairing has three tabs: **Source Code** (both halves, Prism highlighting, line
   numbers, a copy button per file), **Docs** (the sample's own `README.md`, rendered)
   and **Expected Output** (the fenced block from that README).
@@ -315,7 +322,7 @@ npm run typecheck  # vue-tsc --noEmit
 `npm start` and `npm run build` run the generator first, so the Python command
 never has to be remembered: `tools/generate-data.mjs` finds `python3`/`python` and
 runs `tools/generate_dashboard.py` for you. That script reads the *real*
-repository - the language directories, each sample's README table and
+repository - the `langs/<Language>/` directories, each sample's README table and
 expected-output block, and the README's sample index for the platform column - and
 writes `public/interop-data.js`, which the page loads with a `<script>` tag (so it
 needs no fetch and no CORS). It is generated, so it is not tracked in git; a
@@ -323,27 +330,35 @@ checkout that has not run the generator yet boots and says so.
 
 ### Addresses
 
-Every language and every sample has its own address, and the sample's names the pair
-it joins: `/c` for the host language, `/c-elixir` for C driving Elixir, and
-`/c-assembly-32bit` / `/c-assembly-64bit` for the two assembly variants (a pair that
+Every address in the dashboard names a **pairing**, never a language on its own:
+`/c-elixir` is C driving Elixir, `/cpp-lua` is C++ driving Lua, and
+`/c-assembly-32bit` / `/c-assembly-64bit` are the two assembly variants (a pair that
 appears twice keeps the bracket from its folder name). The sidebar entries are real
-links, so they can be copied, bookmarked or opened in a new tab. The site root (`/`)
-opens the first host language, on its alphabetically-first guest. A tab can be named
-on the path (`/c-elixir/docs`), a language page can name its pairing with `?sample=`,
-and a nested `/c/c-elixir` reads the same as the flat form.
+links, so they can be copied, bookmarked or opened in a new tab.
 
-The same pairings can also be named on a subdomain - `c.interop.pattygcoding.com` for
-the language page, `c-elixir.interop.pattygcoding.com` for the sample - because the
-dashboard reads the leftmost host label when it is an id it knows and ignores
-anything else (`www`, or the apex domain itself). That only needs a wildcard `CNAME`
+The **Languages** list is a way into those pairings, not a page of its own: each row
+opens the first pairing that host offers - the guest that sorts first - so clicking
+`C++` lands on `/cpp-assembly-32bit`. The same is true of an address that does name a
+language (`/cpp`, `?item=cpp`, or the `cpp` subdomain): the page resolves it to that
+host's first pairing and rewrites the address to match, so what is on screen is always
+what the address says. From there the header's **Pairing** switcher moves between the
+host's pairings, each one a full address of its own; the list the visitor was browsing
+stays as it was.
+
+A tab can be named on the path (`/c-elixir/docs`), a nested `/cpp/cpp-lua` reads the
+same as the flat form, and the site root (`/`) opens the very first pairing. The same
+pairings can also be named on a subdomain - `c-elixir.interop.pattygcoding.com` for the
+sample, or `c.interop.pattygcoding.com` for that host's first one - because the
+dashboard reads the leftmost host label when it is an id it knows and ignores anything
+else (`www`, or the apex domain itself). That only needs a wildcard `CNAME`
 (`*.interop` -> `pattygcoding.github.io`) beside the record for `interop` itself;
 without it, the path form is the one to use.
 
 GitHub Pages has no rewrite rules, so those pretty paths are backed by
 `public/404.html`: it is served for a path Pages cannot find, rebuilds the request
 as `index.html?item=<id>&tab=<tab>` and leaves the address bar untouched, and the
-page then writes the pretty path back with the History API. `?item=`, `?tab=` and
-`?sample=` are read on load in both shapes, so older links keep working.
+page then writes the pretty path back with the History API. `?item=` and `?tab=` are
+read on load in both shapes, so older links keep working.
 
 To preview the **built** site the way Pages serves it:
 

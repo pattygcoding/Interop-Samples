@@ -58,6 +58,8 @@ export interface Sample {
 export interface Language {
     id: string;
     name: string;
+    /** The folder the language's samples live in, which is what GitHub is linked to. */
+    folder: string;
     prism: string;
     /** The file extension its own code uses, e.g. `.adb`. */
     extension: string;

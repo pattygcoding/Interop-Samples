@@ -2,25 +2,24 @@
 import { computed } from "vue";
 import type { TabId } from "../types";
 import { languageTag } from "../store/data";
-import { activeSample, currentKind, currentName, headerTags, repoFolderName, repoUrl, sampleOptions, sampleSelected, setFacet, showDocsTab, showOutputTab, showSampleSwitcher, state, switchTab, toggleSidebar } from "../store/session";
+import { activeSample, currentName, headerTags, pairingOptions, repoFolderName, repoUrl, setFacet, showDocsTab, showOutputTab, showSampleSwitcher, state, switchTab, toggleSidebar } from "../store/session";
 import { toggleTheme } from "../store/theme";
 import FacetDropdown from "./FacetDropdown.vue";
 
-const title = computed<string>(() => currentName.value || "Select a language");
+const title = computed<string>(() => currentName.value || "Select a pairing");
 
-// The repo link reads as a label rather than a URL, and names the folder it points
-// at inside the project the data came from.
+// The repo link reads as a label rather than a URL, and names the folder it points at
+// inside the project the data came from.
 const repoLabel = computed<string>(() =>
     repoFolderName.value ? "View " + repoFolderName.value + " on GitHub" : "",
 );
 
-// A sample states the mechanism that joins its two programs, and where it runs; a
-// language has neither of its own, so both lines belong to Samples mode only.
-const bridge = computed<string>(() => (sampleSelected.value ? activeSample.value?.bridge ?? "" : ""));
+// The mechanism that joins the two programs, and the systems it runs on.
+const bridge = computed<string>(() => activeSample.value?.bridge ?? "");
 
-const platform = computed<string>(() => (sampleSelected.value ? activeSample.value?.platform ?? "" : ""));
+const platform = computed<string>(() => activeSample.value?.platform ?? "");
 
-// The active tab keeps its filled look; the others stay muted.  A tab the sample
+// The active tab keeps its filled look; the others stay muted.  A tab the pairing
 // cannot show is not rendered at all (a sample whose README has no expected-output
 // block has no third tab).
 function tabClass(tab: TabId): string {
@@ -43,7 +42,7 @@ function tabClass(tab: TabId): string {
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16" /><path d="M4 12h16" /><path d="M4 18h16" /></svg>
             </button>
             <div class="min-w-0">
-                <p class="micro text-fg-dim">{{ currentKind }}</p>
+                <p class="micro text-fg-dim">Interop sample</p>
                 <h2 class="mt-1.5 text-lg font-semibold tracking-tight truncate text-fg-strong">{{ title }}</h2>
                 <!-- The pairing itself, named the way the panel draws it: the host
                      language first, the guest after it. -->
@@ -73,12 +72,12 @@ function tabClass(tab: TabId): string {
             </div>
         </div>
         <div class="flex flex-wrap items-center gap-3">
-            <!-- A language hosts several pairings, so this names which one the panel is
-                 showing - the two code columns and the Docs and Expected Output tabs all
-                 describe it.  A sample page *is* a pairing and needs no switcher. -->
+            <!-- A host offers several pairings, so this moves between them: the two code
+                 columns and the Docs and Expected Output tabs all describe the pairing
+                 named in the address. -->
             <div v-if="showSampleSwitcher" class="flex w-full sm:w-auto sm:min-w-[15rem] items-center gap-2">
                 <p class="micro text-fg-dim shrink-0">Pairing</p>
-                <FacetDropdown id="sample" :options="sampleOptions" @pick="setFacet('sample', $event)" />
+                <FacetDropdown id="sample" :options="pairingOptions" @pick="setFacet('sample', $event)" />
             </div>
             <div class="flex space-x-1 bg-ink-900 border border-line/5 p-1 rounded-md">
                 <button type="button" @click="switchTab('code')" :class="tabClass('code')">Source Code</button>

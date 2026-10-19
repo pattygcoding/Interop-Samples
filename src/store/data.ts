@@ -55,30 +55,23 @@ export function isSample(id: string | null | undefined): boolean {
     return !!sampleById(id);
 }
 
-// Anything that decides whether an id in an address is real reads this.
+// Anything that decides whether an id in an address is real reads this.  A language
+// id is still real - /cpp is a link people may have - but it is only ever a way in.
 export function knownItem(id: string | null | undefined): boolean {
     return isLanguage(id) || isSample(id);
 }
 
-// What the showcase opens on when the address names nothing: the first host
-// language in the list (Ada), whose first sample fills the detail panel.
-export function defaultItemId(): string | null {
-    return languages()[0]?.id ?? samples()[0]?.id ?? null;
+// What the showcase opens on when the address names nothing at all: the first host
+// language's first pairing, which is the first sample the generator listed.
+export function defaultSampleId(): string | null {
+    const language = languages()[0];
+    return firstSampleIdForLanguage(language?.id ?? null) ?? samples()[0]?.id ?? null;
 }
 
-export function itemName(id: string | null): string {
-    return languageById(id)?.name ?? sampleById(id)?.name ?? "";
-}
-
-// The samples an item can show.  A sample item is one sample; a language item is
-// every sample it hosts, in the order the generator sorted them - host, then guest
-// alphabetically - which is what makes the first entry the guest that sorts first.
-export function samplesForItem(itemId: string | null): Sample[] {
-    const sample = sampleById(itemId);
-    if (sample) {
-        return [sample];
-    }
-    const language = languageById(itemId);
+// The pairings one host language offers, in the order the generator sorted them:
+// guest alphabetically.  This is what the header's switcher lists.
+export function languageSamples(languageId: string | null): Sample[] {
+    const language = languageById(languageId);
     if (!language) {
         return [];
     }
@@ -87,30 +80,38 @@ export function samplesForItem(itemId: string | null): Sample[] {
         .filter((entry): entry is Sample => !!entry);
 }
 
-// The sample the panel opens on: the first one the generator listed, which is the
-// alphabetically-first guest language of that host.
-export function defaultSampleId(itemId: string | null): string | null {
-    return samplesForItem(itemId)[0]?.id ?? null;
+// The pairing a language id stands for: the first one it hosts, which is the guest
+// that sorts first.  Nothing in the dashboard is ever "the language on its own" - the
+// address always names a pairing - so this is how `/cpp` becomes `/cpp-assembly-32bit`.
+export function firstSampleIdForLanguage(languageId: string | null): string | null {
+    return languageSamples(languageId)[0]?.id ?? null;
 }
 
-export function sampleForItem(itemId: string | null, sampleId: string | null): Sample | undefined {
-    const choices = samplesForItem(itemId);
-    if (sampleId) {
-        const match = choices.find((entry) => entry.id === sampleId);
-        if (match) {
-            return match;
-        }
+// An id from an address resolved to the pairing it means: a sample id is itself, and a
+// language id is that host's first pairing.  Anything else is not a destination.
+export function resolveSampleId(id: string | null | undefined): string | null {
+    if (isSample(id)) {
+        return id ?? null;
     }
-    return choices[0];
+    return firstSampleIdForLanguage(id ?? null);
+}
+
+// The pairings this sample's host offers, so a page can move between them - the two
+// code columns, the Docs tab and the Expected Output tab all follow.
+export function pairingsForSample(sample: Sample | undefined): Sample[] {
+    if (!sample) {
+        return [];
+    }
+    const pairings = languageSamples(sample.host.id);
+    return pairings.length ? pairings : [sample];
 }
 
 // Whether a sample can show a tab: every sample has its source, and the Docs and
-// Expected Output tabs need the sample's README and its expected-output block.
-export function tabAvailable(itemId: string | null, tab: string, sampleId: string | null): boolean {
+// Expected Output tabs need its README and its expected-output block.
+export function tabAvailable(sample: Sample | undefined, tab: string): boolean {
     if (tab === "code") {
         return true;
     }
-    const sample = sampleForItem(itemId, sampleId);
     if (tab === "docs") {
         return !!sample?.readme;
     }
@@ -120,30 +121,114 @@ export function tabAvailable(itemId: string | null, tab: string, sampleId: strin
     return false;
 }
 
-// The folder an item lives in, used for its GitHub link.
-export function repoFolder(itemId: string | null): string {
-    const sample = sampleById(itemId);
-    if (sample) {
-        return sample.folder;
-    }
-    return languageById(itemId)?.name ?? "";
+// The folder the sample lives in, used for its GitHub link.
+export function repoFolder(sampleId: string | null): string {
+    return sampleById(sampleId)?.folder ?? "";
 }
 
-// `<repository>/tree/<branch>/<folder>`, from the repository and branch the
-// generator recorded (the git remote, else GITHUB_REPOSITORY, else its default),
-// so a clone or a fork links to the right project.
+// `<repository>/tree/<branch>/<folder>`, from the repository and branch the generator
+// recorded (the git remote, else GITHUB_REPOSITORY, else its default), so a clone or a
+// fork links to the right project.  The folder is percent-encoded, so a name with a
+// space, a `+` or a `#` in it opens the folder rather than a fragment of the URL.
 export function repoUrlFor(itemId: string | null): string {
-    const repository = DATA?.meta?.repository;
-    const folder = repoFolder(itemId);
-    if (!repository || !folder) {
-        return "";
-    }
-    return repository + "/tree/" + (DATA?.meta?.branch || "main") + "/" + folder;
+    return repoTreeUrl(repoFolder(itemId));
 }
 
 // The repository root itself, behind the sidebar's GitHub mark.
 export function repoHomeUrl(): string {
     return DATA?.meta?.repository || DEFAULT_REPOSITORY;
+}
+
+export function branch(): string {
+    return DATA?.meta?.branch || "main";
+}
+
+// GitHub's own URLs for this repository percent-encode the characters a path cannot
+// carry: a space is ``%20``, ``C++`` is ``C%2B%2B`` and - the one that silently
+// breaks a link rather than merely looking untidy - ``F#`` is ``F%23``, because a
+// bare ``#`` turns everything after it into a fragment.  Brackets are left as they
+// are, exactly as the README's own sample index writes them.  Each segment is encoded
+// on its own, so the slashes that separate them survive.
+const SAFE_SEGMENT_CHARACTERS = /[A-Za-z0-9\-._~()]/;
+
+export function encodeRepoPath(path: string): string {
+    return path
+        .split("/")
+        .map((segment) =>
+            [...segment]
+                .map((character) =>
+                    SAFE_SEGMENT_CHARACTERS.test(character)
+                        ? character
+                        : encodeURIComponent(character),
+                )
+                .join(""),
+        )
+        .join("/");
+}
+
+export function repoTreeUrl(folder: string): string {
+    const repository = DATA?.meta?.repository;
+    if (!repository || !folder) {
+        return "";
+    }
+    return repository + "/tree/" + branch() + "/" + encodeRepoPath(folder);
+}
+
+export function repoBlobUrl(path: string): string {
+    const repository = DATA?.meta?.repository;
+    if (!repository || !path) {
+        return "";
+    }
+    return repository + "/blob/" + branch() + "/" + encodeRepoPath(path);
+}
+
+// A README may write its links percent-encoded (`C%2B%2B%20with%20Lua`), so each
+// segment is decoded before it is re-encoded; a stray `%` that is not an escape is
+// kept as written rather than thrown away.
+function decodePathSegment(segment: string): string {
+    try {
+        return decodeURIComponent(segment);
+    } catch {
+        return segment;
+    }
+}
+
+// A relative link inside a sample's README, pointed at the file it names on GitHub.
+//
+// The READMEs link to each other - ``../Bash/Bash with Pascal/README.md`` - and those
+// links mean nothing on the site: the Docs tab renders the README at the page's own
+// address, so a relative href would resolve against that and 404.  Resolving it
+// against the sample's folder in the repository is what the link meant in the first
+// place, and GitHub then shows the target with its history and its own relative links
+// intact.  "" leaves the link as the README wrote it (an absolute URL, or a fragment
+// pointing inside the same document).
+export function githubUrlForRelative(folder: string, href: string): string {
+    const repository = DATA?.meta?.repository;
+    if (!repository || !folder) {
+        return "";
+    }
+    const [path, fragment] = href.split("#", 2);
+    if (!path) {
+        return "";   // "#section": a jump inside the rendered README
+    }
+    const segments = folder.split("/");
+    for (const part of path.split("/")) {
+        if (part === "" || part === ".") {
+            continue;
+        }
+        if (part === "..") {
+            segments.pop();
+            continue;
+        }
+        segments.push(decodePathSegment(part));
+    }
+    const target = segments.join("/");
+    // A file is shown with `blob`, a directory with `tree` - the READMEs link to both.
+    const kind = /\.[a-z0-9]+$/i.test(target) ? "blob" : "tree";
+    return (
+        repository + "/" + kind + "/" + branch() + "/" + encodeRepoPath(target) +
+        (fragment ? "#" + fragment : "")
+    );
 }
 
 // A language's short file-extension tag (".adb", ".py") - how the tags in the

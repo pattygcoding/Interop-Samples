@@ -1,16 +1,19 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { parseMarkdown } from "../markdown";
-import type { Block } from "../markdown";
+import type { Block, LinkResolver } from "../markdown";
 import MarkdownCode from "./MarkdownCode.vue";
 
 // A sample's README, rendered from the blocks src/markdown.ts parses: headings,
-// prose, lists, quotes, tables and highlighted code.
+// prose, lists, quotes, tables and highlighted code.  `resolveLink` is how a relative
+// link in the README ("the Ruby sample is over there") reaches GitHub instead of the
+// address bar it would otherwise resolve against.
 const props = defineProps<{
     text: string;
+    resolveLink?: LinkResolver;
 }>();
 
-const blocks = computed<Block[]>(() => parseMarkdown(props.text));
+const blocks = computed<Block[]>(() => parseMarkdown(props.text, props.resolveLink));
 
 function headingClass(level: number): string {
     if (level === 1) {

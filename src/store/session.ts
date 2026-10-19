@@ -16,14 +16,14 @@ function isTab(value: string): value is TabId {
 }
 
 // ---- The address ----------------------------------------------------------------
-// Every language and every sample is addressable on its own path: /c for the
-// language, /c-elixir for the sample it hosts - `<host>-<guest>` - plus a tolerated
-// trailing tab (/c/docs).  A nested /c/c-elixir reads the same as the flat form,
-// which is what the dashboard links.  The dashboard is a static bundle, so the path
-// is resolved client-side with the History API.  A document with a null origin
-// (file://) refuses path writes, so the query-string shape (?item=c-elixir) is used
-// there instead - and that query shape is also what the deployed site's 404.html shim
-// forwards, so `?item=`, `?tab=` and `?sample=` stay readable in both forms.
+// Every address names a pairing: /c-elixir for the sample it joins - `<host>-<guest>` -
+// plus a tolerated trailing tab (/c-elixir/docs).  A language id is only a way in
+// (/cpp), and resolves to the first pairing that host offers.  A nested /cpp/cpp-lua
+// reads the same as the flat form, which is what the dashboard links.  The dashboard is
+// a static bundle, so the path is resolved client-side with the History API.  A document
+// with a null origin (file://) refuses path writes, so the query-string shape
+// (?item=c-elixir) is used there instead - and that query shape is also what the deployed
+// site's 404.html shim forwards, so `?item=` and `?tab=` stay readable in both forms.
 //
 // The directory the site itself is served from is whatever is left above the route:
 // the tab and up to two ids the data knows are stripped, which is what makes one
@@ -69,12 +69,12 @@ let canWritePath = (function probePathWrites(): boolean {
     return true;
 })();
 
-// A subdomain names an item too: ada.interop.pattygcoding.com is the Ada language
-// page and c-elixir.interop.pattygcoding.com is that sample, so a pairing can be
-// shared as a short host as well as a path.  The leftmost label is only read when it
-// is an id the data knows, which keeps the apex domain, `www`, and any other service
-// label out of it - and that is also what makes the rule work under `ada.localhost`
-// on a development machine.
+// A subdomain names a pairing too: c-elixir.interop.pattygcoding.com is that sample, and
+// c.interop.pattygcoding.com is resolved to the first pairing C hosts - a language is
+// never a destination of its own.  The leftmost label is only read when it is an id the
+// data knows, which keeps the apex domain, `www`, and any other service label out of it
+// - and that is also what makes the rule work under `c-elixir.localhost` on a
+// development machine.
 function subdomainItem(): string | null {
     const labels = window.location.hostname.toLowerCase().split(".");
     if (labels.length < 2) {
@@ -84,10 +84,11 @@ function subdomainItem(): string | null {
 }
 
 interface LocationState {
-    itemId: string | null;
-    tab: TabId;
-    /** Which of a language's samples is on screen; null means its first. */
+    /** The pairing the address names - a language id resolves to its first one. */
     sampleId: string | null;
+    tab: TabId;
+    /** Whether the address wrote a language (``/cpp``) rather than a pairing. */
+    namedLanguage: boolean;
     explicitTab: boolean;
 }
 
@@ -96,11 +97,11 @@ function locationState(): LocationState {
     const tail = window.location.pathname.slice(APP_DIR.length).replace(/\/+$/, "");
     const parts = tail ? tail.split("/").filter(Boolean) : [];
     const params = new URLSearchParams(window.location.search || "");
-    // A trailing tab segment is tolerated on the path (/ada/docs); the item is the
-    // segment in front of it.
+    // A trailing tab segment is tolerated on the path (/c-elixir/docs); the pairing is
+    // the segment in front of it.
     const pathTab = parts.length > 1 && isTab(parts[parts.length - 1]) ? (parts.pop() as TabId) : "";
-    // A nested address names the language first and the sample after it; the sample
-    // is the item in either form.
+    // A nested address names the language first and the sample after it; the sample is
+    // the destination in either form.
     const pathId =
         parts.length >= 2 && data.knownItem(parts[1])
             ? parts[1]
@@ -108,51 +109,45 @@ function locationState(): LocationState {
               ? parts[0]
               : "";
     const queryId = params.get("item") || params.get("lang") || "";
-    const itemId = data.knownItem(pathId)
-        ? pathId
-        : data.knownItem(queryId)
-          ? queryId
-          : subdomainItem();
+    const named = data.knownItem(pathId) ? pathId : data.knownItem(queryId) ? queryId : subdomainItem();
     const rawTab = pathTab || params.get("tab") || "";
     return {
-        itemId,
+        // Nothing is ever "the language on its own": /cpp is the host's first pairing,
+        // and the address is rewritten to name it (see `initSession`).
+        sampleId: data.resolveSampleId(named),
         tab: isTab(rawTab) ? rawTab : "code",
-        // A sample's own page names it in the path and needs nothing here; this is how
-        // a language page says which of its pairings is open.
-        sampleId: params.get("sample"),
+        namedLanguage: data.isLanguage(named),
         explicitTab: !!(pathTab || params.get("tab")),
     };
 }
 
-// The address for what is on screen, in whichever shape the browser accepts.  Used
-// for the sidebar's real links too, so a copied or middle-clicked link carries the
-// current tab (and sample) along with the item.
-export function stateUrl(itemId: string, tab: TabId, sampleId: string | null): string {
+// The address for what is on screen, in whichever shape the browser accepts.  Used for
+// the sidebar's real links too, so a copied or middle-clicked link carries the current
+// tab along with the pairing.  There is deliberately no "selected sample" parameter: a
+// pairing is always named in the path, so two visitors who see the same panel see the
+// same address.
+export function stateUrl(sampleId: string, tab: TabId): string {
     const params = new URLSearchParams();
     if (!canWritePath) {
-        params.set("item", itemId);
+        params.set("item", sampleId);
     }
-    // Addresses stay clean: name a tab only when the sample can show it, and name a
-    // sample only when it is not the one the item opens on anyway.
-    if (!data.tabAvailable(itemId, tab, sampleId)) {
+    // Addresses stay clean: name a tab only when the sample can show it.
+    if (!data.tabAvailable(data.sampleById(sampleId), tab)) {
         tab = "code";
     }
     if (tab !== "code") {
         params.set("tab", tab);
     }
-    if (sampleId && sampleId !== data.defaultSampleId(itemId)) {
-        params.set("sample", sampleId);
-    }
     const search = params.toString();
-    const path = canWritePath ? APP_DIR + itemId : window.location.pathname;
+    const path = canWritePath ? APP_DIR + sampleId : window.location.pathname;
     return path + (search ? "?" + search : "");
 }
 
 function syncUrl(mode: "push" | "replace"): void {
-    if (applyingHistory || !state.itemId) {
+    if (applyingHistory || !state.sampleId) {
         return;
     }
-    const url = stateUrl(state.itemId, state.tab, state.sampleId);
+    const url = stateUrl(state.sampleId, state.tab);
     try {
         window.history[mode === "push" ? "pushState" : "replaceState"](null, "", url);
     } catch {
@@ -162,58 +157,51 @@ function syncUrl(mode: "push" | "replace"): void {
     }
 }
 
-// Back/forward: rebuild the view from the address without writing it again.
+// Back/forward: rebuild the view from the address without writing it again.  An entry
+// that names a language brings its list back with it.
 function applyLocation(): void {
     const target = locationState();
     applyingHistory = true;
-    if (target.itemId && target.itemId !== state.itemId) {
-        state.itemId = target.itemId;
-        state.sampleId = data.defaultSampleId(target.itemId);
-        syncMode();
+    if (target.sampleId && target.sampleId !== state.sampleId) {
+        state.sampleId = target.sampleId;
     }
-    const wanted = data.sampleForItem(state.itemId, target.sampleId);
-    if (wanted) {
-        state.sampleId = wanted.id;
-    }
+    state.mode = target.namedLanguage ? "languages" : "samples";
     switchTab(target.explicitTab ? target.tab : "code");
     applyingHistory = false;
 }
 
 // ---- Selection ------------------------------------------------------------------
 export const state = reactive({
-    itemId: null as string | null,
-    tab: "code" as TabId,
-    /** The sample on screen: a language page's pairing is chosen here. */
+    /** The pairing on screen.  It is always a sample id - never a bare language. */
     sampleId: null as string | null,
+    tab: "code" as TabId,
     query: "",
     host: "All",
     bridge: "All",
     guest: "All",
-    mode: "languages" as ModeId,
+    /** Which list the sidebar is showing: every pairing, or one row per host language. */
+    mode: "samples" as ModeId,
     /** The mobile drawer: a slide-in sidebar below `lg`. */
     sidebarOpen: false,
     /** The one filter dropdown allowed open at a time. */
     openMenu: null as MenuId | null,
 });
 
-export const sampleSelected = computed<boolean>(() => data.isSample(state.itemId));
+export const activeSample = computed<Sample | undefined>(() => data.sampleById(state.sampleId));
 
-export const currentName = computed<string>(() => data.itemName(state.itemId));
+export const currentName = computed<string>(() => activeSample.value?.name ?? "");
 
-export const currentKind = computed<string>(() => (sampleSelected.value ? "Interop sample" : "Host language"));
+// The pairings this host offers - what the header's switcher lists and what the list
+// marks as current.
+export const pairings = computed<Sample[]>(() => data.pairingsForSample(activeSample.value));
 
-// The extra facets (Host, Bridge) only describe a sample, so in Languages mode they
-// are ignored and their rows hidden; Guest applies to both: it answers "which
-// languages run a Rust helper" as readily as it filters the sample list.
-export const facetsApply = computed<boolean>(() => sampleSelected.value);
-
-// The samples this item can show: one for a sample page, and every pairing a
-// language hosts - guest-alphabetical - for a language page.
-export const samples = computed<Sample[]>(() => data.samplesForItem(state.itemId));
-
-export const activeSample = computed<Sample | undefined>(() =>
-    data.sampleForItem(state.itemId, state.sampleId),
+export const pairingOptions = computed<FacetOption[]>(() =>
+    pairings.value.map((pairing) => ({ value: pairing.id, label: pairing.name })),
 );
+
+// The switcher only appears where there is something to switch: a host with more than
+// one pairing.
+export const showSampleSwitcher = computed<boolean>(() => pairings.value.length > 1);
 
 // The two sides the panel draws: the host program(s) on the left, the guest on the
 // right.
@@ -225,13 +213,10 @@ export const guestFiles = computed<FileEntry[]>(() =>
     activeSample.value ? data.guestSideFiles(activeSample.value) : [],
 );
 
-// The switcher only appears where there is something to switch: a language page with
-// more than one pairing.  A sample page *is* the pairing.
-export const showSampleSwitcher = computed<boolean>(() => !sampleSelected.value && samples.value.length > 1);
-
-export const sampleOptions = computed<FacetOption[]>(() =>
-    samples.value.map((sample) => ({ value: sample.id, label: sample.name })),
-);
+// The extra facets (Host, Bridge) only describe a sample, so in the Languages list
+// they are ignored and their rows hidden; Guest applies to both: it answers "which
+// languages run a Rust helper" as readily as it filters the pairing list.
+export const facetsApply = computed<boolean>(() => state.mode === "samples");
 
 export const modeItems = computed(() => (facetsApply.value ? data.samples() : data.languages()));
 
@@ -309,43 +294,39 @@ export const metaLine = computed<string>(() => {
 export const repoHomeUrl = computed<string>(() => data.repoHomeUrl());
 
 // ---- The detail panel -----------------------------------------------------------
-export const repoUrl = computed<string>(() => data.repoUrlFor(state.itemId));
+export const repoUrl = computed<string>(() => data.repoUrlFor(state.sampleId));
 
-export const repoFolderName = computed<string>(() => data.repoFolder(state.itemId));
+export const repoFolderName = computed<string>(() => data.repoFolder(state.sampleId));
 
-// The tags the header shows beside the title: a sample's host and guest, or every
-// guest a language hosts.  A guest that has a directory of its own still appears
-// here as a name and an extension rather than as a link, because a click on the row
-// it sits on belongs to the item being shown.
-export const headerTags = computed<Named[]>(() => {
-    const sample = data.sampleById(state.itemId);
-    if (sample) {
-        return data.pairingTags(sample);
-    }
-    return data.languageById(state.itemId)?.guests ?? [];
-});
-
-export const showDocsTab = computed<boolean>(() =>
-    data.tabAvailable(state.itemId, "docs", activeSample.value?.id ?? null),
+// The tags the header shows beside the title: the two languages of the pairing, host
+// first.  A guest that has a directory of its own still appears here as a name and an
+// extension rather than as a link, because a click on the row it sits on belongs to
+// the pairing being shown.
+export const headerTags = computed<Named[]>(() =>
+    activeSample.value ? data.pairingTags(activeSample.value) : [],
 );
 
-export const showOutputTab = computed<boolean>(() =>
-    data.tabAvailable(state.itemId, "output", activeSample.value?.id ?? null),
-);
+export const showDocsTab = computed<boolean>(() => data.tabAvailable(activeSample.value, "docs"));
+
+export const showOutputTab = computed<boolean>(() => data.tabAvailable(activeSample.value, "output"));
 
 export const docsText = computed<string>(() => activeSample.value?.readme ?? "");
 
 export const outputText = computed<string>(() => activeSample.value?.output ?? "");
 
-// The README the Docs tab is rendering, linked on GitHub - the same repository the
-// folder link uses, with the file named this time.
+// The README the Docs tab is rendering, linked on GitHub - the same repository and
+// folder the header's link uses, with the file named and the path encoded.
 export const docsUrl = computed<string>(() => {
-    const repository = data.DATA?.meta?.repository;
     const sample = activeSample.value;
-    if (!repository || !sample) {
-        return "";
-    }
-    return repository + "/blob/" + (data.DATA?.meta?.branch || "main") + "/" + sample.folder + "/README.md";
+    return sample ? data.repoBlobUrl(sample.folder + "/README.md") : "";
+});
+
+// Relative links inside a rendered README - "the Ruby sample is over there" - resolved
+// against the sample's own folder in the repository, because on this page they would
+// otherwise resolve against the address bar and 404.
+export const resolveDocLink = computed<(href: string) => string>(() => {
+    const folder = activeSample.value?.folder ?? "";
+    return (href: string) => data.githubUrlForRelative(folder, href);
 });
 
 // ---- Facets ---------------------------------------------------------------------
@@ -399,42 +380,49 @@ export function setFacet(facet: MenuId, value: string): void {
     state[facet] = value;
 }
 
-// Keep the browse mode in step with the selection: opening /c-elixir (or navigating
-// back to it) must reveal the Samples list it belongs to.
-function syncMode(): void {
-    const mode: ModeId = data.isSample(state.itemId) ? "samples" : "languages";
-    if (mode === state.mode) {
+// Move to a pairing.  A tab the new one cannot show would leave an empty panel, so it
+// falls back to the code before the address below is written - and the address always
+// names the pairing, never a language.
+function applySelection(sampleId: string): void {
+    if (!sampleId) {
         return;
     }
-    state.mode = mode;
-    state.host = "All";
-    state.bridge = "All";
-    state.guest = "All";
-}
-
-// Move the selection.  A tab the new item cannot show would leave an empty panel, and
-// a sample that belongs to the previous item would show the wrong pairing, so both
-// fall back to that item's own before the address below is written.
-function applySelection(id: string): void {
-    if (!id) {
-        return;
-    }
-    state.itemId = id;
-    state.sampleId = data.defaultSampleId(id);
-    if (!data.tabAvailable(id, state.tab, state.sampleId)) {
+    state.sampleId = sampleId;
+    if (!data.tabAvailable(data.sampleById(sampleId), state.tab)) {
         state.tab = "code";
     }
     syncUrl("push");
 }
 
-export function selectItem(id: string): void {
-    applySelection(id);
-    // A tap on a list row ends that interaction, so the mobile drawer goes away.
-    // `setMode` moves the selection through `applySelection` instead, because there
-    // the sidebar has to stay open and show the list that was just asked for.
+// A tap on a row in the Languages list: the row stands for the host, and the panel
+// opens the first pairing it offers - the guest that sorts first.  The list stays the
+// languages one, so the host the visitor picked is still in front of them.
+export function selectLanguage(languageId: string): void {
+    const first = data.firstSampleIdForLanguage(languageId);
+    if (!first) {
+        return;
+    }
+    state.mode = "languages";
+    applySelection(first);
+    state.sidebarOpen = false;   // a tap on a list row ends that interaction
+}
+
+// A tap on a row in the Samples list: that pairing, with the samples list kept.
+export function selectPairing(sampleId: string): void {
+    state.mode = "samples";
+    applySelection(sampleId);
     state.sidebarOpen = false;
 }
 
+// The header's switcher: another pairing of the same host.  The two code columns, the
+// Docs tab and the Expected Output tab all describe one pairing, so switching it
+// switches all of them - and the list the visitor was browsing stays as it was.
+export function selectSample(sampleId: string): void {
+    applySelection(sampleId);
+}
+
+// The pill only chooses which list the sidebar shows; the pairing on screen is the
+// address, and switching lists never moves it.
 export function setMode(mode: ModeId): void {
     if (mode === state.mode) {
         return;
@@ -446,23 +434,10 @@ export function setMode(mode: ModeId): void {
     state.host = "All";
     state.bridge = "All";
     state.guest = "All";
-    const items = mode === "samples" ? data.samples() : data.languages();
-    if (items.some((item) => item.id === state.itemId)) {
-        syncUrl("push");
-        return;
-    }
-    // Carry the context across instead of dropping to the top of the list: a sample
-    // belongs to a host language, and a language's first sample is where its own
-    // list starts.
-    const carried =
-        mode === "languages"
-            ? activeSample.value?.host.id ?? ""
-            : data.languageById(state.itemId)?.sampleIds[0] ?? "";
-    applySelection(data.knownItem(carried) ? carried : items[0]?.id ?? "");
 }
 
 export function switchTab(tab: TabId): void {
-    if (!data.tabAvailable(state.itemId, tab, state.sampleId)) {
+    if (!data.tabAvailable(activeSample.value, tab)) {
         tab = "code";
     }
     const changed = state.tab !== tab;
@@ -470,16 +445,6 @@ export function switchTab(tab: TabId): void {
     if (changed) {
         syncUrl("push");
     }
-}
-
-// The sample switcher on a language page.  The two code columns, the Docs tab and the
-// Expected Output tab all describe one pairing, so switching it switches all of them.
-export function selectSample(id: string): void {
-    if (!id || id === state.sampleId) {
-        return;
-    }
-    state.sampleId = id;
-    syncUrl("push");
 }
 
 export function toggleSidebar(): void {
@@ -499,19 +464,20 @@ export function closeMenus(): void {
 }
 
 // Mirror the address into the view; the address is only written at the end (a tab
-// taken from the URL must not add a history entry).
+// taken from the URL must not add a history entry).  An address that named a language
+// - /cpp, ?item=cpp, or the cpp subdomain - is rewritten to the pairing it stands for,
+// so what the visitor is looking at is what the address says.
 export function initSession(): void {
     if (!data.hasData) {
         return;
     }
     const target = locationState();
-    state.itemId = target.itemId ?? data.defaultItemId();
-    state.sampleId = data.sampleForItem(state.itemId, target.sampleId)?.id ?? data.defaultSampleId(state.itemId);
-    syncMode();
+    state.sampleId = target.sampleId ?? data.defaultSampleId();
+    state.mode = target.namedLanguage ? "languages" : "samples";
     applyingHistory = true;
     switchTab(target.explicitTab ? target.tab : "code");
     applyingHistory = false;
-    syncUrl("replace");   // canonical address for what is on screen
+    syncUrl("replace");
 
     window.addEventListener("popstate", applyLocation);
 }

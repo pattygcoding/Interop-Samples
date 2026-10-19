@@ -33,7 +33,9 @@ const QUOTE = /^>\s?(.*)$/;
 const TABLE_ROW = /^\|(.*)\|$/;
 const TABLE_SEPARATOR = /^\|[\s:|-]+\|$/;
 
-export function parseMarkdown(text: string): Block[] {
+export type LinkResolver = (href: string) => string;
+
+export function parseMarkdown(text: string, resolveLink?: LinkResolver): Block[] {
     const lines = text.replace(/\r\n?/g, "\n").split("\n");
     const blocks: Block[] = [];
     let index = 0;
@@ -61,7 +63,7 @@ export function parseMarkdown(text: string): Block[] {
 
         const heading = HEADING.exec(line);
         if (heading) {
-            blocks.push({ kind: "heading", level: heading[1].length, html: inlineHtml(heading[2]) });
+            blocks.push({ kind: "heading", level: heading[1].length, html: inlineHtml(heading[2], resolveLink) });
             index += 1;
             continue;
         }
@@ -74,11 +76,11 @@ export function parseMarkdown(text: string): Block[] {
 
         // A table is a row of cells followed by its separator line.
         if (TABLE_ROW.test(line.trim()) && index + 1 < lines.length && TABLE_SEPARATOR.test(lines[index + 1].trim())) {
-            const head = splitRow(line);
+            const head = splitRow(line, resolveLink);
             index += 2;
             const rows: string[][] = [];
             while (index < lines.length && TABLE_ROW.test(lines[index].trim())) {
-                rows.push(splitRow(lines[index]));
+                rows.push(splitRow(lines[index], resolveLink));
                 index += 1;
             }
             blocks.push({ kind: "table", head, rows });
@@ -96,7 +98,7 @@ export function parseMarkdown(text: string): Block[] {
                 parts.push(match[1]);
                 index += 1;
             }
-            blocks.push({ kind: "quote", html: inlineHtml(parts.join(" ")) });
+            blocks.push({ kind: "quote", html: inlineHtml(parts.join(" "), resolveLink) });
             continue;
         }
 
@@ -121,7 +123,7 @@ export function parseMarkdown(text: string): Block[] {
                 }
                 break;
             }
-            blocks.push({ kind: "list", ordered: isOrdered, items: items.map(inlineHtml) });
+            blocks.push({ kind: "list", ordered: isOrdered, items: items.map((item) => inlineHtml(item, resolveLink)) });
             continue;
         }
 
@@ -131,7 +133,7 @@ export function parseMarkdown(text: string): Block[] {
             index += 1;
         }
         if (paragraph.length) {
-            blocks.push({ kind: "paragraph", html: inlineHtml(paragraph.join(" ")) });
+            blocks.push({ kind: "paragraph", html: inlineHtml(paragraph.join(" "), resolveLink) });
         } else {
             index += 1;   // a line this parser does not know: never stall on it
         }
@@ -152,40 +154,55 @@ function startsBlock(line: string): boolean {
     );
 }
 
-function splitRow(line: string): string[] {
+function splitRow(line: string, resolveLink?: LinkResolver): string[] {
     return line
         .trim()
         .replace(/^\||\|$/g, "")
         .split("|")
-        .map((cell) => inlineHtml(cell.trim()));
+        .map((cell) => inlineHtml(cell.trim(), resolveLink));
 }
 
 // Inline markdown, on text that has already been escaped.  Code spans are handled
 // first and kept literal, so the `*` and `_` inside them cannot be read as emphasis.
-export function inlineHtml(text: string): string {
+export function inlineHtml(text: string, resolveLink?: LinkResolver): string {
     return text
         .split("`")
-        .map((part, index) => (index % 2 === 1 ? "<code>" + escapeHtml(part) + "</code>" : emphasise(escapeHtml(part))))
+        .map((part, index) =>
+            index % 2 === 1
+                ? "<code>" + escapeHtml(part) + "</code>"
+                : emphasise(escapeHtml(part), resolveLink),
+        )
         .join("");
 }
 
-function emphasise(escaped: string): string {
+function emphasise(escaped: string, resolveLink?: LinkResolver): string {
     return escaped
-        .replace(/\[([^\]]+)\]\(([^)<>]+)\)/g, (_match, label: string, href: string) => link(label, href))
+        .replace(/\[([^\]]+)\]\(([^)<>]+)\)/g, (_match, label: string, href: string) =>
+            link(label, href, resolveLink),
+        )
         .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
         .replace(/(^|[\s(])\*([^*\s][^*]*)\*/g, "$1<em>$2</em>");
 }
 
 // Only the link shapes these READMEs use become anchors, and a target that could
-// break out of the attribute is left as plain text.
-function link(label: string, href: string): string {
-    const target = href.trim();
-    if (/["']/.test(target) || !/^(https?:\/\/|mailto:|\/|\.|#)/i.test(target)) {
+// break out of the attribute is left as plain text.  A relative target is handed to
+// the resolver first: on the site a README's "see the Ruby sample" link has to point
+// at GitHub, because there is no such file next to the page.
+function link(label: string, href: string, resolveLink?: LinkResolver): string {
+    let target = href.trim();
+    if (/["']/.test(target)) {
         return label;
     }
-    const external = /^https?:/i.test(target);
+    const isRelativePath = !/^(https?:\/\/|mailto:|\/|#)/i.test(target);
+    if (isRelativePath && resolveLink) {
+        target = resolveLink(target) || target;
+    }
+    const isExternal = /^https?:/i.test(target);
+    if (!isExternal && !/^(mailto:|\/|\.|#)/i.test(target)) {
+        return label;
+    }
     return (
-        '<a href="' + target + '"' + (external ? ' target="_blank" rel="noopener"' : "") +
+        '<a href="' + target + '"' + (isExternal ? ' target="_blank" rel="noopener"' : "") +
         ' class="text-accent hover:underline">' + label + "</a>"
     );
 }

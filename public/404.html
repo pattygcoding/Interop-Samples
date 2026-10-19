@@ -45,12 +45,12 @@
             // that owns it - never part of the path the site is served from - so that
             // segment is dropped too.
             if (slug.indexOf("-") !== -1) { parts.pop(); }
-            // Anything else the link carried (?sample=, most importantly) has to survive
-            // the trip, so the dashboard can put the exact address back in the bar.
+            // A tolerated path segment names the tab explicitly; the dashboard works out
+            // whether that item even has it and falls back to its code if not.  Any tab
+            // the link carried (?tab=docs) is kept here, so the exact address can go back
+            // in the bar.
             var params = new URLSearchParams(window.location.search || "");
             params.delete("item");
-            // A tolerated path segment names the tab explicitly; the dashboard works out
-            // whether that item even has it and falls back to its code if not.
             if (tab) { params.set("tab", tab); }
             var query = params.toString();
             // The target is built from the site root, not from the address that got here:

@@ -1,7 +1,7 @@
 # Java with C#
 
 Java starts a .NET console app and exchanges data with it over **stdin/stdout**
-using JSON — the same protocol the [JavaScript with C#](../JavaScript/JavaScript%20with%20C%23/README.md)
+using JSON — the same protocol the [JavaScript with C#](../../JavaScript/JavaScript%20with%20C%23/README.md)
 sample uses.
 
 | | |
